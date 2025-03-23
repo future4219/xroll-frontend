@@ -145,6 +145,33 @@ function VideoItem({
     }
   }, [isActive]);
 
+  // active になったとき、動画が再生されていなければ再試行するポーリング処理（最大5回、300ms間隔）
+  useEffect(() => {
+    if (isActive && videoRef.current) {
+      let attempts = 0;
+      const maxAttempts = 5;
+      const intervalId = setInterval(() => {
+        if (videoRef.current && videoRef.current.paused) {
+          videoRef.current
+            .play()
+            .then(() => {
+              clearInterval(intervalId);
+            })
+            .catch((err) => {
+              console.error("再生エラー (ポーリング):", err);
+              attempts++;
+              if (attempts >= maxAttempts) {
+                clearInterval(intervalId);
+              }
+            });
+        } else {
+          clearInterval(intervalId);
+        }
+      }, 300);
+      return () => clearInterval(intervalId);
+    }
+  }, [isActive]);
+
   const togglePlay = () => {
     if (!videoRef.current) return;
     if (isPlaying) {
@@ -210,28 +237,26 @@ function VideoItem({
     >
       {shouldRenderContent ? (
         <>
-          {/* 動画本体 */}
           <video
             ref={videoRef}
             src={video.video_url}
             className="h-full w-full object-contain"
             loop
             playsInline
-            autoPlay // autoPlay 属性を追加
+            autoPlay
             preload={isActive ? "auto" : "metadata"}
             muted={isMuted}
             controls
             onLoadedData={() => {
-              // 少し遅延させて再生を試みる
               if (isActive && videoRef.current) {
                 setTimeout(() => {
-                  videoRef.current?.play()
+                  videoRef.current
+                    ?.play()
                     .catch((err) => console.error("再生エラー:", err));
                 }, 100);
               }
             }}
           />
-          {/* 画面右下のボタン群 */}
           <div
             className="absolute bottom-40 right-4 flex flex-col items-center space-y-6 text-white"
             onClick={(e) => e.stopPropagation()}
@@ -257,12 +282,16 @@ function VideoItem({
               </div>
               <span className="text-xs">433</span>
             </button>
-            <button onClick={handleSave} className="flex flex-col items-center">
+            <a
+              href={video.video_url}
+              download
+              className="flex flex-col items-center"
+            >
               <div className="mb-1 flex items-center justify-center">
                 <MdOutlineSaveAlt size={24} />
               </div>
               <span className="text-xs">4432</span>
-            </button>
+            </a>
             <button onClick={toggleMute} className="flex flex-col items-center">
               <div className="mb-1 flex items-center justify-center">
                 {isMuted ? (
@@ -275,11 +304,10 @@ function VideoItem({
           </div>
         </>
       ) : (
-        // プレースホルダー
         <div className="h-full w-full bg-black"></div>
       )}
     </div>
   );
 }
 
-export default MainVideoListPresenter;
+export default VideoItem;

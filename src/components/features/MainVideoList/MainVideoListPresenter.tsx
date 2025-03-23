@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { Video } from "@/entities/video/entity";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 import { FaRegCommentDots } from "react-icons/fa";
@@ -15,9 +15,27 @@ export function MainVideoListPresenter({
   videos,
   loadMore,
 }: MainVideoListPresenterProps) {
-  const [activeIndex, setActiveIndex] = useState(0);
+  // activeIndex の初期値を localStorage から取得（存在しなければ 0）
+  const [activeIndex, setActiveIndex] = useState<number>(() => {
+    const stored = localStorage.getItem("lastActiveIndex");
+    return stored ? Number(stored) : 0;
+  });
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isMuted, setIsMuted] = useState(true);
+  const hasRestoredRef = useRef(false);
+
+  // activeIndex を localStorage に保存
+  useEffect(() => {
+    localStorage.setItem("lastActiveIndex", activeIndex.toString());
+  }, [activeIndex]);
+
+  // マウント時に保存された activeIndex に基づいてスクロール位置を復元
+  useLayoutEffect(() => {
+    if (!hasRestoredRef.current && containerRef.current && videos.length > 0) {
+      containerRef.current.scrollTop = activeIndex * window.innerHeight;
+      hasRestoredRef.current = true;
+    }
+  }, [videos]);
 
   // スクロール時に各動画要素の中心との距離を計算して、最も近い動画を activeIndex に設定
   useEffect(() => {
@@ -56,7 +74,7 @@ export function MainVideoListPresenter({
       className="h-screen w-full snap-y snap-mandatory overflow-y-auto bg-black"
     >
       {videos.map((video, index) => {
-        // インデックス差によるレンダリング制御（±10）
+        // インデックス差によるレンダリング制御（ここでは±10）
         const shouldRenderVideo = Math.abs(index - activeIndex) <= 10;
         return (
           <VideoItem
@@ -199,15 +217,17 @@ function VideoItem({
             className="h-full w-full object-contain"
             loop
             playsInline
+            autoPlay // autoPlay 属性を追加
             preload={isActive ? "auto" : "metadata"}
             muted={isMuted}
             controls
-            // onLoadedData で PC の場合、動画がロード完了したら再生をトリガー
             onLoadedData={() => {
+              // 少し遅延させて再生を試みる
               if (isActive && videoRef.current) {
-                videoRef.current
-                  .play()
-                  .catch((err) => console.error("再生エラー:", err));
+                setTimeout(() => {
+                  videoRef.current?.play()
+                    .catch((err) => console.error("再生エラー:", err));
+                }, 100);
               }
             }}
           />
@@ -255,7 +275,7 @@ function VideoItem({
           </div>
         </>
       ) : (
-        // プレースホルダー（コンテンツが表示されない場合）
+        // プレースホルダー
         <div className="h-full w-full bg-black"></div>
       )}
     </div>

@@ -5,10 +5,10 @@ import { Video } from "@/entities/video/entity";
 
 export function MainVideoListContainer() {
   const [videos, setVideos] = useState<Video[]>([]);
-  const [offset, setOffset] = useState(0); // オフセット用の state を追加
+  const [offset, setOffset] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const limitNumber = 10;
-  const didFetch = useRef(false); // 最初の呼び出しを追跡する ref
+  const didFetch = useRef(false);
 
   const fetchVideos = async (
     currentOffset: number,
@@ -30,11 +30,18 @@ export function MainVideoListContainer() {
     }
   };
 
-  // 初回ロード（offset=0）; Strict Mode 対策で useRef を利用
+  // 初回ロード：localStorage の activeIndex に応じた件数を一度に取得
   useEffect(() => {
     if (didFetch.current) return;
     didFetch.current = true;
-    fetchVideos(0, limitNumber);
+    const storedIndexStr = localStorage.getItem("lastActiveIndex");
+    let initialLimit = limitNumber;
+    if (storedIndexStr) {
+      const storedIndex = Number(storedIndexStr);
+      // 保存された activeIndex までの動画が取得できるよう、limitNumber の倍数に丸める
+      initialLimit = Math.ceil((storedIndex + 1) / limitNumber) * limitNumber;
+    }
+    fetchVideos(0, initialLimit);
   }, []);
 
   // リストの末尾に到達したら追加取得

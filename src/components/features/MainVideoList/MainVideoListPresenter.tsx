@@ -1,5 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Video } from "@/entities/video/entity";
+import { BsHeart, BsHeartFill } from "react-icons/bs";
+import { FaRegCommentDots } from "react-icons/fa";
+import { MdOutlineSaveAlt } from "react-icons/md";
+import { IoVolumeHighOutline, IoVolumeMuteOutline } from "react-icons/io5";
 
 interface MainVideoListPresenterProps {
   videos: Video[];
@@ -10,6 +14,7 @@ export function MainVideoListPresenter({
 }: MainVideoListPresenterProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [isMuted, setIsMuted] = useState(true); // 初期はミュート
 
   // スクロール時に各動画要素の中心との距離を計算して、最も近い動画を activeIndex に設定
   useEffect(() => {
@@ -38,13 +43,15 @@ export function MainVideoListPresenter({
   return (
     <div
       ref={containerRef}
-      className="h-screen w-full snap-y snap-mandatory overflow-y-auto bg-black"
+      className=" h-screen w-full snap-y snap-mandatory overflow-y-auto bg-black"
     >
       {videos.map((video, index) => (
         <VideoItem
           key={video.id}
           video={video}
           isActive={index === activeIndex}
+          isMuted={isMuted}
+          setIsMuted={setIsMuted}
         />
       ))}
     </div>
@@ -54,13 +61,14 @@ export function MainVideoListPresenter({
 interface VideoItemProps {
   video: Video;
   isActive: boolean;
+  isMuted: boolean;
+  setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function VideoItem({ video, isActive }: VideoItemProps) {
+function VideoItem({ video, isActive, isMuted, setIsMuted }: VideoItemProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const progressBarRef = useRef<HTMLDivElement | null>(null);
-  const [isMuted, setIsMuted] = useState(true); // 初期はミュート
   const [isPlaying, setIsPlaying] = useState(true);
+  const [isLiked, setIsLiked] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isSeeking, setIsSeeking] = useState(false);
   // 最新の isSeeking 状態を参照するための ref
@@ -90,30 +98,11 @@ function VideoItem({ video, isActive }: VideoItemProps) {
       v.pause();
       v.currentTime = 0;
       setIsPlaying(false);
-      setProgress(0);
     }
   }, [isActive]);
 
   // timeupdate イベントでは、isSeekingRef を利用してドラッグ中は進捗を更新しない
-  useEffect(() => {
-    if (!videoRef.current) return;
-    const handleTimeUpdate = () => {
-      if (
-        videoRef.current &&
-        videoRef.current.duration &&
-        !isSeekingRef.current
-      ) {
-        setProgress(videoRef.current.currentTime / videoRef.current.duration);
-      }
-    };
-    const videoEl = videoRef.current;
-    videoEl.addEventListener("timeupdate", handleTimeUpdate);
-    return () => {
-      videoEl.removeEventListener("timeupdate", handleTimeUpdate);
-    };
-  }, []);
 
-  // 動画タップで再生/ポーズ切替
   const togglePlay = () => {
     if (!videoRef.current) return;
     if (isPlaying) {
@@ -124,9 +113,21 @@ function VideoItem({ video, isActive }: VideoItemProps) {
       setIsPlaying(true);
     }
   };
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // スペースキー (e.code === "Space" または e.key === " ")
+      if (e.code === "Space" || e.key === " ") {
+        e.preventDefault();
+        togglePlay();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isPlaying]);
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setIsLiked((prev) => !prev);
     console.log("いいね clicked for video", video.id);
   };
 
@@ -145,67 +146,9 @@ function VideoItem({ video, isActive }: VideoItemProps) {
     setIsMuted((prev) => !prev);
   };
 
-  // シーク更新用の共通処理
-  const updateSeek = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!progressBarRef.current || !videoRef.current) return;
-    const rect = progressBarRef.current.getBoundingClientRect();
-    // console.log(rect)
-    console.log(e.clientX, rect.left);
-
- console.log("clientX", e.clientX);
- console.log("screenX", e.screenX);
- console.log("pageX", e.nativeEvent.pageX);
-  console.log("offsetX", e.nativeEvent.offsetX);
-  console.log("e.movement")
-
-    let x = e.clientX - rect.left;
-    // console.log(x, rect.width);
-
-    let newProgress = x / rect.width;
-    // console.log(newProgress);
-    newProgress = Math.max(0, Math.min(1, newProgress));
-    // console.log(newProgress);
-    setProgress(newProgress);
-
-    if (videoRef.current.duration) {
-      // console.log(videoRef.current.duration, newProgress);
-      videoRef.current.currentTime = videoRef.current.duration * newProgress;
-      // console.log(videoRef.current.currentTime);
-    }
-  };
-  // ドラッグ開始時
-  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsSeeking(true);
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
-    updateSeek(e);
-  };
-
-  // ドラッグ中
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    // console.log("pointer move");
-    e.stopPropagation();
-    if (isSeeking) {
-      // console.log("seeking");
-      updateSeek(e);
-    }
-  };
-
-  // ドラッグ終了時
-  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    if (isSeeking) {
-      updateSeek(e);
-      setIsSeeking(false);
-      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
-    }
-  };
-
   return (
     <div
-      className="relative flex h-screen snap-start items-center justify-center"
-      onClick={togglePlay}
+      className={`chrome-bottom-fix relative flex h-screen snap-start items-center justify-center`}
     >
       {/* 動画本体 */}
       <video
@@ -219,64 +162,44 @@ function VideoItem({ video, isActive }: VideoItemProps) {
         controls
       />
 
-      {/* 再生中でない場合、中央に薄い ▶ アイコンを表示 */}
-      {!isPlaying && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-6xl text-white opacity-50">▶</div>
-        </div>
-      )}
-
       {/* 画面右下のボタン群 */}
       <div
         className="absolute bottom-40 right-4 flex flex-col items-center space-y-6 text-white"
         onClick={(e) => e.stopPropagation()}
       >
         <button onClick={handleLike} className="flex flex-col items-center">
-          <div className="mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-white text-black">
-            ♡
+          <div className="mb-1 flex h-6 w-8 items-center justify-center text-3xl font-light text-white">
+            {isLiked ? (
+              <div className="text-red-500">
+                <BsHeartFill size={20} />
+              </div>
+            ) : (
+              <BsHeart size={20} />
+            )}
           </div>
           <span className="text-xs">12.3k</span>
         </button>
         <button onClick={handleComment} className="flex flex-col items-center">
-          <div className="mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-white text-black">
-            💬
+          <div className="mb-1 flex  items-center justify-center font-thin">
+            <FaRegCommentDots size={24} />
           </div>
           <span className="text-xs">433</span>
         </button>
         <button onClick={handleSave} className="flex flex-col items-center">
-          <div className="mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-white text-black">
-            📁
+          <div className="mb-1 flex items-center justify-center ">
+            <MdOutlineSaveAlt size={24} />
           </div>
           <span className="text-xs">4432</span>
         </button>
         <button onClick={toggleMute} className="flex flex-col items-center">
-          <div className="mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-white text-black">
-            {isMuted ? "🔇" : "🔊"}
+          <div className="mb-1 flex  items-center justify-center">
+            {isMuted ? (
+              <IoVolumeMuteOutline size={24} />
+            ) : (
+              <IoVolumeHighOutline size={24} />
+            )}
           </div>
-          <span className="text-xs">{isMuted ? "音声OFF" : "音声ON"}</span>
         </button>
-      </div>
-
-      {/* 再生バー：クリック・ドラッグでシーク可能 */}
-      <div
-        className="absolute bottom-0 left-0 h-1 w-full bg-gray-600"
-        ref={progressBarRef}
-        onClick={(e) => e.stopPropagation()}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerUp}
-      >
-        {/* 現在の進捗を示すバー */}
-        <div
-          className="h-full bg-red-500"
-          style={{ width: `${progress * 100}%` }}
-        />
-        {/* ドラッグ可能なハンドル */}
-        <div
-          className="absolute -top-2 h-5 w-5 -translate-x-1/2 rounded-full bg-white"
-          style={{ left: `${progress * 100}%` }}
-        />
       </div>
     </div>
   );

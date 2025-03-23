@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* iOS Safariの下部固定ボタン対応用のスタイル */
+
+/* 基本の下部固定スタイル */
+.ios-bottom-fix {
+    bottom: env(safe-area-inset-bottom); /* セーフエリアの値を適用 */
+}
+
+.safari-bottom-fix {
+    height: 89vh;
+}
+
+.chrome-bottom-fix {
+    height: 86vh;
+}
+
+.hoge {
+  padding-bottom: calc(env(safe-area-inset-bottom));
+}

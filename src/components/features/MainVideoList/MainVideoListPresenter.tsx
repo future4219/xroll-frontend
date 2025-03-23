@@ -56,7 +56,7 @@ export function MainVideoListPresenter({
       className="h-screen w-full snap-y snap-mandatory overflow-y-auto bg-black"
     >
       {videos.map((video, index) => {
-        // インデックス差によるレンダリング制御（±5）
+        // インデックス差によるレンダリング制御（±10）
         const shouldRenderVideo = Math.abs(index - activeIndex) <= 10;
         return (
           <VideoItem
@@ -97,11 +97,10 @@ function VideoItem({
 
   // IntersectionObserver で実際の可視性を取得
   const { ref, inView } = useInView({
-    threshold: 0.5, // 50%以上表示されているかどうか
+    threshold: 0.5,
     triggerOnce: false,
   });
 
-  // フックの順序は常に一定
   useEffect(() => {
     isSeekingRef.current = isSeeking;
   }, [isSeeking]);
@@ -171,7 +170,6 @@ function VideoItem({
     setIsMuted((prev) => !prev);
   };
 
-  // deviceFix() の結果をメモ化
   const deviceClass = React.useMemo(() => {
     const ua = navigator.userAgent;
     if (
@@ -188,7 +186,6 @@ function VideoItem({
   const shouldRenderContent = shouldRenderVideo && inView;
 
   return (
-    // IntersectionObserver の ref をコンテナ div に設定
     <div
       ref={ref}
       className={`${deviceClass} relative flex h-screen snap-start items-center justify-center`}
@@ -205,6 +202,14 @@ function VideoItem({
             preload={isActive ? "auto" : "metadata"}
             muted={isMuted}
             controls
+            // onLoadedData で PC の場合、動画がロード完了したら再生をトリガー
+            onLoadedData={() => {
+              if (isActive && videoRef.current) {
+                videoRef.current
+                  .play()
+                  .catch((err) => console.error("再生エラー:", err));
+              }
+            }}
           />
           {/* 画面右下のボタン群 */}
           <div

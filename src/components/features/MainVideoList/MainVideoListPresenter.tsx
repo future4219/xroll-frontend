@@ -4,17 +4,20 @@ import { BsHeart, BsHeartFill } from "react-icons/bs";
 import { FaRegCommentDots } from "react-icons/fa";
 import { MdOutlineSaveAlt } from "react-icons/md";
 import { IoVolumeHighOutline, IoVolumeMuteOutline } from "react-icons/io5";
+import { useInView } from "react-intersection-observer";
 
 interface MainVideoListPresenterProps {
   videos: Video[];
+  loadMore: () => void;
 }
 
 export function MainVideoListPresenter({
   videos,
+  loadMore,
 }: MainVideoListPresenterProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [isMuted, setIsMuted] = useState(true); // 初期はミュート
+  const [isMuted, setIsMuted] = useState(true);
 
   // スクロール時に各動画要素の中心との距離を計算して、最も近い動画を activeIndex に設定
   useEffect(() => {
@@ -40,20 +43,32 @@ export function MainVideoListPresenter({
     return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // activeIndex が動画リストの最後に到達したら loadMore を呼び出す
+  useEffect(() => {
+    if (activeIndex === videos.length - 1) {
+      loadMore();
+    }
+  }, [activeIndex, videos.length, loadMore]);
+
   return (
     <div
       ref={containerRef}
-      className=" h-screen w-full snap-y snap-mandatory overflow-y-auto bg-black"
+      className="h-screen w-full snap-y snap-mandatory overflow-y-auto bg-black"
     >
-      {videos.map((video, index) => (
-        <VideoItem
-          key={video.id}
-          video={video}
-          isActive={index === activeIndex}
-          isMuted={isMuted}
-          setIsMuted={setIsMuted}
-        />
-      ))}
+      {videos.map((video, index) => {
+        // インデックス差によるレンダリング制御（±5）
+        const shouldRenderVideo = Math.abs(index - activeIndex) <= 10;
+        return (
+          <VideoItem
+            key={`${video.id}-${index}`}
+            video={video}
+            isActive={index === activeIndex}
+            isMuted={isMuted}
+            setIsMuted={setIsMuted}
+            shouldRenderVideo={shouldRenderVideo}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -63,28 +78,40 @@ interface VideoItemProps {
   isActive: boolean;
   isMuted: boolean;
   setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
+  shouldRenderVideo: boolean;
 }
 
-function VideoItem({ video, isActive, isMuted, setIsMuted }: VideoItemProps) {
+function VideoItem({
+  video,
+  isActive,
+  isMuted,
+  setIsMuted,
+  shouldRenderVideo,
+}: VideoItemProps) {
+  // フックは常に呼ぶ
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [isSeeking, setIsSeeking] = useState(false);
-  // 最新の isSeeking 状態を参照するための ref
   const isSeekingRef = useRef(false);
+
+  // IntersectionObserver で実際の可視性を取得
+  const { ref, inView } = useInView({
+    threshold: 0.5, // 50%以上表示されているかどうか
+    triggerOnce: false,
+  });
+
+  // フックの順序は常に一定
   useEffect(() => {
     isSeekingRef.current = isSeeking;
   }, [isSeeking]);
 
-  // ミュート状態を video 要素に反映
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.muted = isMuted;
     }
   }, [isMuted]);
 
-  // active 状態で自動再生／停止
   useEffect(() => {
     if (!videoRef.current) return;
     const v = videoRef.current;
@@ -101,8 +128,6 @@ function VideoItem({ video, isActive, isMuted, setIsMuted }: VideoItemProps) {
     }
   }, [isActive]);
 
-  // timeupdate イベントでは、isSeekingRef を利用してドラッグ中は進捗を更新しない
-
   const togglePlay = () => {
     if (!videoRef.current) return;
     if (isPlaying) {
@@ -113,9 +138,9 @@ function VideoItem({ video, isActive, isMuted, setIsMuted }: VideoItemProps) {
       setIsPlaying(true);
     }
   };
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // スペースキー (e.code === "Space" または e.key === " ")
       if (e.code === "Space" || e.key === " ") {
         e.preventDefault();
         togglePlay();
@@ -146,61 +171,88 @@ function VideoItem({ video, isActive, isMuted, setIsMuted }: VideoItemProps) {
     setIsMuted((prev) => !prev);
   };
 
-  return (
-    <div
-      className={`chrome-bottom-fix relative flex h-screen snap-start items-center justify-center`}
-    >
-      {/* 動画本体 */}
-      <video
-        ref={videoRef}
-        src={video.video_url}
-        className="h-full w-full object-contain"
-        loop
-        playsInline
-        preload="auto"
-        muted={isMuted}
-        controls
-      />
+  // deviceFix() の結果をメモ化
+  const deviceClass = React.useMemo(() => {
+    const ua = navigator.userAgent;
+    if (
+      ua.indexOf("iPhone") > 0 ||
+      ua.indexOf("iPod") > 0 ||
+      (ua.indexOf("Android") > 0 && ua.indexOf("Mobile") > 0)
+    ) {
+      return "safari-bottom-fix";
+    }
+    return "";
+  }, []);
 
-      {/* 画面右下のボタン群 */}
-      <div
-        className="absolute bottom-40 right-4 flex flex-col items-center space-y-6 text-white"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button onClick={handleLike} className="flex flex-col items-center">
-          <div className="mb-1 flex h-6 w-8 items-center justify-center text-3xl font-light text-white">
-            {isLiked ? (
-              <div className="text-red-500">
-                <BsHeartFill size={20} />
+  // 両方の条件を満たす場合にコンテンツをレンダリング
+  const shouldRenderContent = shouldRenderVideo && inView;
+
+  return (
+    // IntersectionObserver の ref をコンテナ div に設定
+    <div
+      ref={ref}
+      className={`${deviceClass} relative flex h-screen snap-start items-center justify-center`}
+    >
+      {shouldRenderContent ? (
+        <>
+          {/* 動画本体 */}
+          <video
+            ref={videoRef}
+            src={video.video_url}
+            className="h-full w-full object-contain"
+            loop
+            playsInline
+            preload={isActive ? "auto" : "metadata"}
+            muted={isMuted}
+            controls
+          />
+          {/* 画面右下のボタン群 */}
+          <div
+            className="absolute bottom-40 right-4 flex flex-col items-center space-y-6 text-white"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button onClick={handleLike} className="flex flex-col items-center">
+              <div className="mb-1 flex h-6 w-8 items-center justify-center text-3xl font-light">
+                {isLiked ? (
+                  <div className="text-red-500">
+                    <BsHeartFill size={20} />
+                  </div>
+                ) : (
+                  <BsHeart size={20} />
+                )}
               </div>
-            ) : (
-              <BsHeart size={20} />
-            )}
+              <span className="text-xs">12.3k</span>
+            </button>
+            <button
+              onClick={handleComment}
+              className="flex flex-col items-center"
+            >
+              <div className="mb-1 flex items-center justify-center font-thin">
+                <FaRegCommentDots size={24} />
+              </div>
+              <span className="text-xs">433</span>
+            </button>
+            <button onClick={handleSave} className="flex flex-col items-center">
+              <div className="mb-1 flex items-center justify-center">
+                <MdOutlineSaveAlt size={24} />
+              </div>
+              <span className="text-xs">4432</span>
+            </button>
+            <button onClick={toggleMute} className="flex flex-col items-center">
+              <div className="mb-1 flex items-center justify-center">
+                {isMuted ? (
+                  <IoVolumeMuteOutline size={24} />
+                ) : (
+                  <IoVolumeHighOutline size={24} />
+                )}
+              </div>
+            </button>
           </div>
-          <span className="text-xs">12.3k</span>
-        </button>
-        <button onClick={handleComment} className="flex flex-col items-center">
-          <div className="mb-1 flex  items-center justify-center font-thin">
-            <FaRegCommentDots size={24} />
-          </div>
-          <span className="text-xs">433</span>
-        </button>
-        <button onClick={handleSave} className="flex flex-col items-center">
-          <div className="mb-1 flex items-center justify-center ">
-            <MdOutlineSaveAlt size={24} />
-          </div>
-          <span className="text-xs">4432</span>
-        </button>
-        <button onClick={toggleMute} className="flex flex-col items-center">
-          <div className="mb-1 flex  items-center justify-center">
-            {isMuted ? (
-              <IoVolumeMuteOutline size={24} />
-            ) : (
-              <IoVolumeHighOutline size={24} />
-            )}
-          </div>
-        </button>
-      </div>
+        </>
+      ) : (
+        // プレースホルダー（コンテンツが表示されない場合）
+        <div className="h-full w-full bg-black"></div>
+      )}
     </div>
   );
 }

@@ -5,15 +5,20 @@ import { FaRegCommentDots } from "react-icons/fa";
 import { MdOutlineSaveAlt } from "react-icons/md";
 import { IoVolumeHighOutline, IoVolumeMuteOutline } from "react-icons/io5";
 import { useInView } from "react-intersection-observer";
+import { id } from "date-fns/locale";
 
 interface MainVideoListPresenterProps {
+  setVideos: React.Dispatch<React.SetStateAction<Video[]>>;
   videos: Video[];
   loadMore: () => void;
+  likeVideo: (id: number) => void;
 }
 
 export function MainVideoListPresenter({
+  setVideos,
   videos,
   loadMore,
+  likeVideo,
 }: MainVideoListPresenterProps) {
   // activeIndex の初期値を localStorage から取得（存在しなければ 0）
   const [activeIndex, setActiveIndex] = useState<number>(() => {
@@ -79,11 +84,13 @@ export function MainVideoListPresenter({
         return (
           <VideoItem
             key={`${video.id}-${index}`}
+            setVideos={setVideos}
             video={video}
             isActive={index === activeIndex}
             isMuted={isMuted}
             setIsMuted={setIsMuted}
             shouldRenderVideo={shouldRenderVideo}
+            likeVideo={likeVideo}
           />
         );
       })}
@@ -92,19 +99,23 @@ export function MainVideoListPresenter({
 }
 
 interface VideoItemProps {
+  setVideos: React.Dispatch<React.SetStateAction<Video[]>>;
   video: Video;
   isActive: boolean;
   isMuted: boolean;
   setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
   shouldRenderVideo: boolean;
+  likeVideo: (id: number) => void;
 }
 
 function VideoItem({
+  setVideos,
   video,
   isActive,
   isMuted,
   setIsMuted,
   shouldRenderVideo,
+  likeVideo,
 }: VideoItemProps) {
   // フックは常に呼ぶ
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -196,8 +207,18 @@ function VideoItem({
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    if (isLiked) {
+      setVideos((prev) =>
+        prev.map((v) =>
+          v.id === video.id ? { ...v, like_count: v.like_count! - 1 } : v,
+        ),
+      );
+    } else {
+      localStorage.setItem(`liked-${video.id}`, "1");
+      likeVideo(video.id);
+    }
     setIsLiked((prev) => !prev);
-    console.log("いいね clicked for video", video.id);
   };
 
   const handleComment = (e: React.MouseEvent) => {
@@ -271,7 +292,7 @@ function VideoItem({
                   <BsHeart size={20} />
                 )}
               </div>
-              <span className="text-xs">12.3k</span>
+              <span className="text-xs">{video.like_count}</span>
             </button>
             <button
               onClick={handleComment}

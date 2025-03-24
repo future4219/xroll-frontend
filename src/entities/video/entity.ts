@@ -5,5 +5,6 @@ export type Video = {
   tweet_url?: string;
   download_count?: number;
   ranking?: number;
+  like_count?: number;
   created_at?: string;
 };

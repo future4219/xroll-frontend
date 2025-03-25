@@ -5,13 +5,14 @@ import { FaRegCommentDots } from "react-icons/fa";
 import { MdOutlineSaveAlt } from "react-icons/md";
 import { IoVolumeHighOutline, IoVolumeMuteOutline } from "react-icons/io5";
 import { useInView } from "react-intersection-observer";
-import { id } from "date-fns/locale";
+import { CommentModal } from "@/components/features/MainVideoList/CommentModal";
 
 interface MainVideoListPresenterProps {
   setVideos: React.Dispatch<React.SetStateAction<Video[]>>;
   videos: Video[];
   loadMore: () => void;
   likeVideo: (id: number) => void;
+  commentVideo: (id: number, comment: string) => void;
 }
 
 export function MainVideoListPresenter({
@@ -19,6 +20,7 @@ export function MainVideoListPresenter({
   videos,
   loadMore,
   likeVideo,
+  commentVideo,
 }: MainVideoListPresenterProps) {
   // activeIndex の初期値を localStorage から取得（存在しなければ 0）
   const [activeIndex, setActiveIndex] = useState<number>(() => {
@@ -91,6 +93,7 @@ export function MainVideoListPresenter({
             setIsMuted={setIsMuted}
             shouldRenderVideo={shouldRenderVideo}
             likeVideo={likeVideo}
+            commentVideo={commentVideo}
           />
         );
       })}
@@ -106,6 +109,7 @@ interface VideoItemProps {
   setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
   shouldRenderVideo: boolean;
   likeVideo: (id: number) => void;
+  commentVideo: (id: number, comment: string) => void;
 }
 
 function VideoItem({
@@ -116,6 +120,7 @@ function VideoItem({
   setIsMuted,
   shouldRenderVideo,
   likeVideo,
+  commentVideo,
 }: VideoItemProps) {
   // フックは常に呼ぶ
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -123,6 +128,7 @@ function VideoItem({
   const [isLiked, setIsLiked] = useState(false);
   const [isSeeking, setIsSeeking] = useState(false);
   const isSeekingRef = useRef(false);
+  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
 
   // IntersectionObserver で実際の可視性を取得
   const { ref, inView } = useInView({
@@ -214,6 +220,7 @@ function VideoItem({
           v.id === video.id ? { ...v, like_count: v.like_count! - 1 } : v,
         ),
       );
+      localStorage.removeItem(`liked-${video.id}`);
     } else {
       localStorage.setItem(`liked-${video.id}`, "1");
       likeVideo(video.id);
@@ -221,8 +228,9 @@ function VideoItem({
     setIsLiked((prev) => !prev);
   };
 
-  const handleComment = (e: React.MouseEvent) => {
+  const handleClickCommentButton = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setIsCommentModalOpen(true);
     console.log("コメント clicked for video", video.id);
   };
 
@@ -284,7 +292,7 @@ function VideoItem({
           >
             <button onClick={handleLike} className="flex flex-col items-center">
               <div className="mb-1 flex h-6 w-8 items-center justify-center text-3xl font-light">
-                {isLiked ? (
+                {isLiked || localStorage.getItem(`liked-${video.id}`) ? (
                   <div className="text-red-500">
                     <BsHeartFill size={20} />
                   </div>
@@ -295,13 +303,13 @@ function VideoItem({
               <span className="text-xs">{video.like_count}</span>
             </button>
             <button
-              onClick={handleComment}
+              onClick={handleClickCommentButton}
               className="flex flex-col items-center"
             >
               <div className="mb-1 flex items-center justify-center font-thin">
                 <FaRegCommentDots size={24} />
               </div>
-              <span className="text-xs">433</span>
+              <span className="text-xs">{video.comments.length}</span>
             </button>
             <a
               href={video.video_url}
@@ -311,7 +319,6 @@ function VideoItem({
               <div className="mb-1 flex items-center justify-center">
                 <MdOutlineSaveAlt size={24} />
               </div>
-              <span className="text-xs">4432</span>
             </a>
             <button onClick={toggleMute} className="flex flex-col items-center">
               <div className="mb-1 flex items-center justify-center">
@@ -323,6 +330,14 @@ function VideoItem({
               </div>
             </button>
           </div>
+          <CommentModal
+            isOpen={isCommentModalOpen}
+            onClose={() => setIsCommentModalOpen(false)}
+            videoId={video.id}
+            comments={video.comments}
+            commentVideo={commentVideo}
+            setVideos={setVideos}
+          />
         </>
       ) : (
         <div className="h-full w-full bg-black"></div>

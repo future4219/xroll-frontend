@@ -2,7 +2,6 @@ import axios from "axios";
 import { useEffect, useState, useRef } from "react";
 import { MainVideoListPresenter } from "@/components/features/MainVideoList/MainVideoListPresenter";
 import { Video } from "@/entities/video/entity";
-import { set } from "date-fns";
 
 export function MainVideoListContainer() {
   const [videos, setVideos] = useState<Video[]>([]);
@@ -22,6 +21,8 @@ export function MainVideoListContainer() {
       const response = await axios.get(`${apiUrl}/videos`, {
         params: { offset: currentOffset, limit },
       });
+
+      console.log(response.data);
       // 取得した動画を既存のリストに連結
       setVideos((prev) => [...prev, ...response.data.videos]);
       // オフセットを更新
@@ -79,12 +80,26 @@ export function MainVideoListContainer() {
     }
   };
 
+  const commentVideo = async (id: number, comment: string) => {
+    try {
+      const response = await axios.post(`${apiUrl}/videos/${id}/comment`, {
+        comment,
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.error("APIエラー:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <MainVideoListPresenter
       setVideos={setVideos}
       videos={videos}
       loadMore={loadMore}
       likeVideo={likeVideo}
+      commentVideo={commentVideo}
     />
   );
 }

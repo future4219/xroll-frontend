@@ -1,7 +1,7 @@
 // CommentModal.tsx
+import { Comment, Video } from "@/entities/video/entity";
 import React, { useEffect } from "react";
 import { PiUserCircleLight } from "react-icons/pi";
-import { Comment, Video } from "@/entities/video/entity";
 
 interface CommentModalProps {
   isOpen: boolean;

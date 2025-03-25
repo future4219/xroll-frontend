@@ -1,7 +1,7 @@
-import axios from "axios";
-import { useEffect, useState, useRef } from "react";
 import { MainVideoListPresenter } from "@/components/features/MainVideoList/MainVideoListPresenter";
 import { Video } from "@/entities/video/entity";
+import axios from "axios";
+import { useEffect, useRef, useState } from "react";
 
 export function MainVideoListContainer() {
   const [videos, setVideos] = useState<Video[]>([]);

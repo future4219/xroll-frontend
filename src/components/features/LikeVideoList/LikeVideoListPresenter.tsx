@@ -52,7 +52,7 @@ export function LikeVideoListPresenter({
       containerRef.current.scrollTop = activeIndex * window.innerHeight;
     }
   }, [isVideoModalOpen, activeIndex]);
-  
+
   return (
     <div>
       {isVideoModalOpen ? (
@@ -109,6 +109,7 @@ export function LikeVideoListPresenter({
                   alt={`Video ${index}`}
                   className="h-auto w-full shadow-sm"
                 />
+                
               </div>
             ))}
           </div>

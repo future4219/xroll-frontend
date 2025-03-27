@@ -97,7 +97,7 @@ export function CommentModal({
               <div key={c.id} className="flex gap-2">
                 <PiUserCircleLight size={48} />
                 <div className="flex w-full flex-col">
-                  <span className="text-sm font-bold">ユーザー名</span>
+                  <span className="text-sm font-bold">unknown</span>
                   <span
                     className="whitespace-normal"
                     style={{ overflowWrap: "anywhere" }}
@@ -118,6 +118,11 @@ export function CommentModal({
             className="w-full rounded border p-2"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && comment !== "") {
+                handleClickCommentButton();
+              }
+            }}
           />
           <button
             onClick={handleClickCommentButton}

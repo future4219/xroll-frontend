@@ -9,7 +9,6 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Sample />} />
         <Route path={appUrl.mainVideoList} element={<MainVideoList />} />
         <Route path={appUrl.likeVideoList} element={<LikeVideoList />} />
       </Routes>

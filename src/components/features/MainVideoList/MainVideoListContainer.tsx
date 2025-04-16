@@ -10,7 +10,7 @@ export function MainVideoListContainer() {
   const limitNumber = 10;
   const didFetch = useRef(false);
 
-  const apiUrl = "http://192.168.40.176:8000";
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   const fetchVideos = async (
     currentOffset: number,

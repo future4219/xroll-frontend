@@ -4,7 +4,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 export function LikeVideoListContainer() {
-  const apiUrl = "http://192.168.40.176:8000";
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   const [likeVideos, setLikeVideos] = useState<Video[]>([]);
 

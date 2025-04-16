@@ -1,5 +1,5 @@
 export const appUrl = {
   employeeList: "/employees",
-  mainVideoList: "/main-video-list",
+  mainVideoList: "/",
   likeVideoList: "/like-video-list",
 } as const;

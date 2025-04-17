@@ -6,6 +6,22 @@
 2. `npm i`を実行
    必要なモジュールが自動でインストールされる
 
+## Deploying
+
+以下のコマンドを実行して、最新のコードを取得し、ビルドして、Nginxの公開ディレクトリに配置する。
+
+# リポジトリの最新化
+git pull
+
+# ビルド
+npm run build
+
+# デプロイ（ビルドしたファイルをNginxの公開ディレクトリにコピー）
+sudo cp -r ./dist /var/www/xroll-frontend/
+
+# Nginxを再起動して変更を反映
+sudo systemctl restart nginx
+
 ## Usages
 
 ```sh

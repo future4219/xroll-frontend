@@ -54,7 +54,7 @@ export function LikeVideoListPresenter({
   }, [isVideoModalOpen, activeIndex]);
 
   return (
-    <div>
+    <div className="bg-black">
       {isVideoModalOpen ? (
         <div className="relative">
           {/* 戻るボタン */}
@@ -94,25 +94,30 @@ export function LikeVideoListPresenter({
           {/* 固定のタブ領域 */}
           <TabNavigation />
           {/* コンテンツ領域 */}
-          <div className="columns-2 gap-[2px] sm:columns-3 md:columns-4 lg:columns-5">
-            {likeVideos.map((video, index) => (
-              <div
-                key={video.id}
-                onClick={() => {
-                  setActiveIndex(index);
-                  setIsVideoModalOpen(true);
-                }}
-                className="mb-[2px] cursor-pointer break-inside-avoid"
-              >
-                <img
-                  src={video.thumbnail_url}
-                  alt={`Video ${index}`}
-                  className="h-auto w-full shadow-sm"
-                />
-                
-              </div>
-            ))}
+          <div className="columns-2 gap-[2px] bg-black sm:columns-3 md:columns-4 lg:columns-5">
+            {likeVideos.length > 0 &&
+              likeVideos.map((video, index) => (
+                <div
+                  key={video.id}
+                  onClick={() => {
+                    setActiveIndex(index);
+                    setIsVideoModalOpen(true);
+                  }}
+                  className="mb-[2px] cursor-pointer break-inside-avoid"
+                >
+                  <img
+                    src={video.thumbnail_url}
+                    alt={`Video ${index}`}
+                    className="h-auto w-full shadow-sm"
+                  />
+                </div>
+              ))}
           </div>
+          {likeVideos.length === 0 && (
+            <div className="flex h-screen items-center justify-center font-bold text-white">
+              いいねした動画はありません
+            </div>
+          )}
         </div>
       )}
     </div>

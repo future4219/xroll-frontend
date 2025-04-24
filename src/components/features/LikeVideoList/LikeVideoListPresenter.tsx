@@ -1,8 +1,7 @@
-import { TabNavigation } from "@/components/features/MainVideoList/TabNavigation";
 import VideoItem from "@/components/features/MainVideoList/VideoItem";
+import { Header } from "@/components/ui/Header";
 import { Video } from "@/entities/video/entity";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { IoIosArrowBack } from "react-icons/io";
 
 interface LikeVideoListPresenterProps {
   setLikeVideos: React.Dispatch<React.SetStateAction<Video[]>>;
@@ -57,14 +56,15 @@ export function LikeVideoListPresenter({
     <div className="bg-black">
       {isVideoModalOpen ? (
         <div className="relative">
+          <Header />
           {/* 戻るボタン */}
-          <button
+          {/* <button
             onClick={() => setIsVideoModalOpen(false)}
             className="absolute top-8 z-50  flex rounded px-3  py-1 font-bold text-white  focus:outline-none"
           >
             <IoIosArrowBack size={24} />
             <div>戻る</div>
-          </button>
+          </button> */}
           {/* モーダル内のコンテンツ領域 */}
           <div
             ref={containerRef}
@@ -92,7 +92,7 @@ export function LikeVideoListPresenter({
       ) : (
         <div className="relative">
           {/* 固定のタブ領域 */}
-          <TabNavigation />
+          <Header />
           {/* コンテンツ領域 */}
           <div className="columns-2 gap-[2px] bg-black sm:columns-3 md:columns-4 lg:columns-5">
             {likeVideos.length > 0 &&

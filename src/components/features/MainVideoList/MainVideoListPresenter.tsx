@@ -1,5 +1,5 @@
-import { TabNavigation } from "@/components/features/MainVideoList/TabNavigation";
 import VideoItem from "@/components/features/MainVideoList/VideoItem";
+import { Header } from "@/components/ui/Header";
 import { Video } from "@/entities/video/entity";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
@@ -72,31 +72,34 @@ export function MainVideoListPresenter({
   }, [activeIndex, videos.length, loadMore]);
 
   return (
-    <div className="relative">
-      {/* 固定のタブボタン領域 */}
-      <TabNavigation />
-      {/* ヘッダーの高さ分、上部にパディングを追加（例：p-t-20） */}
-      <div
-        ref={containerRef}
-        className="h-screen w-full snap-y snap-mandatory overflow-y-auto bg-black pt-20"
-      >
-        {videos.map((video, index) => {
-          // インデックス差によるレンダリング制御（ここでは±10）
-          const shouldRenderVideo = Math.abs(index - activeIndex) <= 10;
-          return (
-            <VideoItem
-              key={`${video.id}-${index}`}
-              setVideos={setVideos}
-              video={video}
-              isActive={index === activeIndex}
-              isMuted={isMuted}
-              setIsMuted={setIsMuted}
-              shouldRenderVideo={shouldRenderVideo}
-              likeVideo={likeVideo}
-              commentVideo={commentVideo}
-            />
-          );
-        })}
+    <div>
+      <div className="relative">
+        {/* 固定のタブボタン領域 */}
+        {/* <TabNavigation /> */}
+        <Header />
+        {/* ヘッダーの高さ分、上部にパディングを追加（例：p-t-20） */}
+        <div
+          ref={containerRef}
+          className="h-screen w-full snap-y snap-mandatory overflow-y-auto bg-black pt-20"
+        >
+          {videos.map((video, index) => {
+            // インデックス差によるレンダリング制御（ここでは±10）
+            const shouldRenderVideo = Math.abs(index - activeIndex) <= 10;
+            return (
+              <VideoItem
+                key={`${video.id}-${index}`}
+                setVideos={setVideos}
+                video={video}
+                isActive={index === activeIndex}
+                isMuted={isMuted}
+                setIsMuted={setIsMuted}
+                shouldRenderVideo={shouldRenderVideo}
+                likeVideo={likeVideo}
+                commentVideo={commentVideo}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );

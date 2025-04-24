@@ -176,7 +176,7 @@ function VideoItem({
           <video
             ref={videoRef}
             src={video.video_url}
-            className="h-full w-full object-contain"
+            className=" h-full w-full object-contain"
             loop
             playsInline
             autoPlay

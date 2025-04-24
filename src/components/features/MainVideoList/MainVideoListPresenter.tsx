@@ -33,12 +33,18 @@ export function MainVideoListPresenter({
   }, [activeIndex]);
 
   // マウント時に保存された activeIndex に基づいてスクロール位置を復元
+  const videoRefs = useRef<(HTMLDivElement | null)[]>([]); // 動画ごとのdivにrefつける
+
   useLayoutEffect(() => {
-    if (!hasRestoredRef.current && containerRef.current && videos.length > 0) {
-      containerRef.current.scrollTop = activeIndex * window.innerHeight;
-      hasRestoredRef.current = true;
+    if (!hasRestoredRef.current && videos.length > 0) {
+      const target = videoRefs.current[activeIndex];
+      if (target) {
+        target.scrollIntoView({ behavior: "auto" });
+        hasRestoredRef.current = true;
+      }
     }
-  }, [videos]);
+  }, [videos, activeIndex]);
+
 
   // スクロール時に各動画要素の中心との距離を計算して、最も近い動画を activeIndex に設定
   useEffect(() => {
@@ -83,20 +89,27 @@ export function MainVideoListPresenter({
           className="h-screen w-full snap-y snap-mandatory overflow-y-auto bg-black pt-20"
         >
           {videos.map((video, index) => {
-            // インデックス差によるレンダリング制御（ここでは±10）
-            const shouldRenderVideo = Math.abs(index - activeIndex) <= 10;
+            const shouldRenderVideo = Math.abs(index - activeIndex) <= 5;
+
             return (
-              <VideoItem
+              <div
                 key={`${video.id}-${index}`}
-                setVideos={setVideos}
-                video={video}
-                isActive={index === activeIndex}
-                isMuted={isMuted}
-                setIsMuted={setIsMuted}
-                shouldRenderVideo={shouldRenderVideo}
-                likeVideo={likeVideo}
-                commentVideo={commentVideo}
-              />
+                className="h-screen snap-start"
+                ref={(el) => (videoRefs.current[index] = el)} // ←ここでrefを格納
+              >
+                {shouldRenderVideo ? (
+                  <VideoItem
+                    setVideos={setVideos}
+                    video={video}
+                    isActive={index === activeIndex}
+                    isMuted={isMuted}
+                    setIsMuted={setIsMuted}
+                    shouldRenderVideo={shouldRenderVideo}
+                    likeVideo={likeVideo}
+                    commentVideo={commentVideo}
+                  />
+                ) : null}
+              </div>
             );
           })}
         </div>

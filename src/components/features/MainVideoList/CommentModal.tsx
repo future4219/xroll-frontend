@@ -21,7 +21,7 @@ export function CommentModal({
   setVideos,
 }: CommentModalProps) {
   if (!isOpen) return null;
-
+console.log(comments);
   const [comment, setComment] = React.useState("");
   const sleep = (msec: number) =>
     new Promise((resolve) => setTimeout(resolve, msec));
@@ -57,7 +57,7 @@ export function CommentModal({
               ...video,
               comments: [
                 { id: 0, video_id: videoId, comment },
-                ...video.comments,
+                ...(video.comments ?? []),
               ],
             }
           : video,
@@ -88,12 +88,13 @@ export function CommentModal({
         {/* コメント一覧エリア */}
         <div className="mt-4 flex-grow overflow-y-auto border-b">
           <div className="flex flex-col gap-4">
-            {comments.length === 0 && (
-              <div className="py-4 text-center text-gray-500">
-                一番乗りにコメントしましょう！
-              </div>
-            )}
-            {comments.map((c) => (
+            {comments?.length === 0 ||
+              (comments == undefined && (
+                <div className="py-4 text-center text-gray-500">
+                  一番乗りにコメントしましょう！
+                </div>
+              ))}
+            {comments?.map((c) => (
               <div key={c.id} className="flex gap-2">
                 <PiUserCircleLight size={48} />
                 <div className="flex w-full flex-col">

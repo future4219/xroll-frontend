@@ -84,6 +84,7 @@ export function LikeVideoListPresenter({
                   shouldRenderVideo={shouldRenderVideo}
                   likeVideo={likeVideo}
                   commentVideo={commentVideo}
+                  isAd={false} // 広告は表示しない
                 />
               );
             })}

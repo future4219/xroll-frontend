@@ -227,7 +227,7 @@ function VideoItem({
                   <div className="mb-1 flex items-center justify-center font-thin">
                     <FaRegCommentDots size={24} />
                   </div>
-                  <span className="text-xs">{video.comments.length}</span>
+                  <span className="text-xs">{video.comments?.length ?? 0}</span>
                 </button>
                 <a
                   href={video.video_url}

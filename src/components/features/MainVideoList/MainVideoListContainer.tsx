@@ -49,7 +49,7 @@ export function MainVideoListContainer() {
     }
 
     try {
-      const response = await axios.post(`${apiUrl}/videos/${id}/like`);
+      const response = await axios.post(`${apiUrl}/videos/like/${id}`);
       console.log(response.data);
       localStorage.setItem(`liked_${id}`, "true");
     } catch (error) {
@@ -82,7 +82,7 @@ export function MainVideoListContainer() {
 
   const commentVideo = async (id: number, comment: string) => {
     try {
-      const response = await axios.post(`${apiUrl}/videos/${id}/comment`, {
+      const response = await axios.post(`${apiUrl}/videos/comment/${id}`, {
         comment,
       });
       console.log(response.data);

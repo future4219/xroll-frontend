@@ -1,6 +1,8 @@
+import AdBanner from "@/components/ads/juicyAds";
 import VideoItem from "@/components/features/MainVideoList/VideoItem";
 import { Header } from "@/components/ui/Header";
 import { Video } from "@/entities/video/entity";
+import { transformValue } from "framer-motion";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 interface MainVideoListPresenterProps {
@@ -86,17 +88,32 @@ export function MainVideoListPresenter({
             // インデックス差によるレンダリング制御（ここでは±10）
             const shouldRenderVideo = Math.abs(index - activeIndex) <= 10;
             return (
-              <VideoItem
-                key={`${video.id}-${index}`}
-                setVideos={setVideos}
-                video={video}
-                isActive={index === activeIndex}
-                isMuted={isMuted}
-                setIsMuted={setIsMuted}
-                shouldRenderVideo={shouldRenderVideo}
-                likeVideo={likeVideo}
-                commentVideo={commentVideo}
-              />
+              <>
+                {(index + 1) % 3 === 0 && (
+                  <VideoItem
+                    setVideos={setVideos}
+                    video={video}
+                    isActive={index === activeIndex}
+                    isMuted={isMuted}
+                    setIsMuted={setIsMuted}
+                    shouldRenderVideo={shouldRenderVideo}
+                    likeVideo={likeVideo}
+                    commentVideo={commentVideo}
+                    isAd={true} // 3件ごとに広告を表示するフラグ
+                  />
+                )}
+                <VideoItem
+                  setVideos={setVideos}
+                  video={video}
+                  isActive={index === activeIndex}
+                  isMuted={isMuted}
+                  setIsMuted={setIsMuted}
+                  shouldRenderVideo={shouldRenderVideo}
+                  likeVideo={likeVideo}
+                  commentVideo={commentVideo}
+                  isAd={false} // 3件ごとに広告を表示するフラグ
+                />
+              </>
             );
           })}
         </div>

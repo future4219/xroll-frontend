@@ -1,5 +1,7 @@
+import AdBanner from "@/components/ads/juicyAds";
 import { CommentModal } from "@/components/features/MainVideoList/CommentModal";
 import { Video } from "@/entities/video/entity";
+import { is } from "date-fns/locale";
 import React, { useEffect, useRef, useState } from "react";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 import { FaRegCommentDots } from "react-icons/fa";
@@ -16,6 +18,7 @@ interface VideoItemProps {
   shouldRenderVideo: boolean;
   likeVideo: (id: number) => void;
   commentVideo: (id: number, comment: string) => void;
+  isAd: boolean;
 }
 
 function VideoItem({
@@ -27,6 +30,7 @@ function VideoItem({
   shouldRenderVideo,
   likeVideo,
   commentVideo,
+  isAd,
 }: VideoItemProps) {
   // フックは常に呼ぶ
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -173,78 +177,90 @@ function VideoItem({
     >
       {shouldRenderContent ? (
         <>
-          <video
-            ref={videoRef}
-            src={video.video_url}
-            className=" h-full w-full object-contain"
-            loop
-            playsInline
-            autoPlay
-            preload={isActive ? "auto" : "metadata"}
-            muted={isMuted}
-            controls
-            onLoadedData={() => {
-              if (isActive && videoRef.current) {
-                setTimeout(() => {
-                  videoRef.current
-                    ?.play()
-                    .catch((err) => console.error("再生エラー:", err));
-                }, 100);
-              }
-            }}
-          />
-          <div
-            className="absolute bottom-40 right-4 flex flex-col items-center space-y-6 text-white"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button onClick={handleLike} className="flex flex-col items-center">
-              <div className="mb-1 flex h-6 w-8 items-center justify-center text-3xl font-light">
-                {isLiked || localStorage.getItem(`liked-${video.id}`) ? (
-                  <div className="text-red-500">
-                    <BsHeartFill size={20} />
+          {isAd ? (
+            <AdBanner />
+          ) : (
+            <>
+              <video
+                ref={videoRef}
+                src={video.video_url}
+                className=" h-full w-full object-contain"
+                loop
+                playsInline
+                autoPlay
+                preload={isActive ? "auto" : "metadata"}
+                muted={isMuted}
+                controls
+                onLoadedData={() => {
+                  if (isActive && videoRef.current) {
+                    setTimeout(() => {
+                      videoRef.current
+                        ?.play()
+                        .catch((err) => console.error("再生エラー:", err));
+                    }, 100);
+                  }
+                }}
+              />
+              <div
+                className="absolute bottom-40 right-4 flex flex-col items-center space-y-6 text-white"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  onClick={handleLike}
+                  className="flex flex-col items-center"
+                >
+                  <div className="mb-1 flex h-6 w-8 items-center justify-center text-3xl font-light">
+                    {isLiked || localStorage.getItem(`liked-${video.id}`) ? (
+                      <div className="text-red-500">
+                        <BsHeartFill size={20} />
+                      </div>
+                    ) : (
+                      <BsHeart size={20} />
+                    )}
                   </div>
-                ) : (
-                  <BsHeart size={20} />
-                )}
+                  <span className="text-xs">{video.like_count}</span>
+                </button>
+                <button
+                  onClick={handleClickCommentButton}
+                  className="flex flex-col items-center"
+                >
+                  <div className="mb-1 flex items-center justify-center font-thin">
+                    <FaRegCommentDots size={24} />
+                  </div>
+                  <span className="text-xs">{video.comments.length}</span>
+                </button>
+                <a
+                  href={video.video_url}
+                  download
+                  className="flex flex-col items-center"
+                >
+                  <div className="mb-1 flex items-center justify-center">
+                    <MdOutlineSaveAlt size={24} />
+                  </div>
+                </a>
+                <button
+                  onClick={toggleMute}
+                  className="flex flex-col items-center"
+                >
+                  <div className="mb-1 flex items-center justify-center">
+                    {isMuted ? (
+                      <IoVolumeMuteOutline size={24} />
+                    ) : (
+                      <IoVolumeHighOutline size={24} />
+                    )}
+                  </div>
+                </button>
               </div>
-              <span className="text-xs">{video.like_count}</span>
-            </button>
-            <button
-              onClick={handleClickCommentButton}
-              className="flex flex-col items-center"
-            >
-              <div className="mb-1 flex items-center justify-center font-thin">
-                <FaRegCommentDots size={24} />
-              </div>
-              <span className="text-xs">{video.comments.length}</span>
-            </button>
-            <a
-              href={video.video_url}
-              download
-              className="flex flex-col items-center"
-            >
-              <div className="mb-1 flex items-center justify-center">
-                <MdOutlineSaveAlt size={24} />
-              </div>
-            </a>
-            <button onClick={toggleMute} className="flex flex-col items-center">
-              <div className="mb-1 flex items-center justify-center">
-                {isMuted ? (
-                  <IoVolumeMuteOutline size={24} />
-                ) : (
-                  <IoVolumeHighOutline size={24} />
-                )}
-              </div>
-            </button>
-          </div>
-          <CommentModal
-            isOpen={isCommentModalOpen}
-            onClose={() => setIsCommentModalOpen(false)}
-            videoId={video.id}
-            comments={video.comments}
-            commentVideo={commentVideo}
-            setVideos={setVideos}
-          />
+              <CommentModal
+                isOpen={isCommentModalOpen}
+                onClose={() => setIsCommentModalOpen(false)}
+                videoId={video.id}
+                comments={video.comments}
+                commentVideo={commentVideo}
+                setVideos={setVideos}
+              />
+            </>
+          )}
         </>
       ) : (
         <div className="h-full w-full bg-black"></div>

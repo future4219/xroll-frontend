@@ -18,7 +18,7 @@ export function MainVideoListContainer() {
   ) => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`${apiUrl}/videos`, {
+      const response = await axios.get(`${apiUrl}/videos/search`, {
         params: { offset: currentOffset, limit },
       });
 

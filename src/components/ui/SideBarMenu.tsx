@@ -1,6 +1,12 @@
 import logo from "@/components/ui/xroll.png";
 import { useEffect, useRef, useState } from "react";
-import { IoIosBook, IoIosHeart, IoMdHome, IoMdMenu } from "react-icons/io";
+import {
+  IoIosBook,
+  IoIosHeart,
+  IoMdHome,
+  IoMdMenu,
+  IoMdSave,
+} from "react-icons/io";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -74,6 +80,15 @@ export function SidebarMenu() {
                   >
                     <IoIosHeart className="text-white" size={30} />
                     <span className="text-white">いいねした動画</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/twitter-video-save"
+                    className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
+                  >
+                    <IoMdSave className="text-white" size={30} />
+                    <span className="text-white">動画保存</span>
                   </a>
                 </li>
                 <li>

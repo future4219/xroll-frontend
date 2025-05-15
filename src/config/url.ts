@@ -3,4 +3,5 @@ export const appUrl = {
   mainVideoList: "/",
   likeVideoList: "/like-video-list",
   policy: "/policy",
+  twitterVideoSave: "/twitter-video-save",
 } as const;

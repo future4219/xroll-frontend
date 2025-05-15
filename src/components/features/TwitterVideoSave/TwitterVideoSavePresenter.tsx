@@ -19,7 +19,7 @@ export function TwitterVideoSavePresenter({
   return (
     <div className="flex min-h-screen flex-col ">
       <Header bgColor="bg-black" />
-      <main className="mx-auto w-full max-w-3xl px-4 py-8 pt-12">
+      <main className="mx-auto w-full max-w-3xl px-4 py-8 pt-24">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-gray-900">
             Twitter動画保存ツール
@@ -77,9 +77,7 @@ export function TwitterVideoSavePresenter({
           </p>
         </div>
       </main>
-      <div className="sticky bottom-0 mt-auto w-full">
-        <Footer />
-      </div>
+      <Footer />
     </div>
   );
 }

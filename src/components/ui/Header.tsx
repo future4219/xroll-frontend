@@ -7,7 +7,7 @@ type Props = {
 };
 export function Header({ bgColor }: Props) {
   return (
-    <header className={`top-0 left-0 z-50 w-full text-white ${bgColor} ${!bgColor && "fixed"}`}>
+    <header className={`top-0 left-0 z-50 w-full text-white ${bgColor} fixed`}>
       <div className="relative mx-auto flex h-full max-w-5xl items-center justify-between">
         <div className="flex items-center">
           <SidebarMenu />

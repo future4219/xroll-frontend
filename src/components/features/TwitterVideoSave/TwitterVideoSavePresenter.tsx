@@ -1,3 +1,4 @@
+import AdBanner, { JuicyAdsBanner } from "@/components/ads/juicyAds";
 import { Footer } from "@/components/ui/Footer";
 import { Header } from "@/components/ui/Header";
 
@@ -52,6 +53,8 @@ export function TwitterVideoSavePresenter({
           </form>
           {error && <div className="text-red-500 ">{error}</div>}
         </div>
+        <AdBanner />
+        <JuicyAdsBanner />
         {/* 取得した動画のリンクを表示する部分 */}
         {videoUrl !== "" && (
           <div className="mt-8 rounded-lg border border-gray-300 bg-white p-6 shadow">

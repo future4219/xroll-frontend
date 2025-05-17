@@ -7,7 +7,7 @@ export function PolicyPresenter() {
     <div className="flex min-h-screen flex-col">
       <Header bgColor="bg-black" />
 
-      <div className="mx-auto max-w-3xl px-4 py-8 text-sm leading-relaxed text-gray-800">
+      <div className="mx-auto max-w-3xl px-4 py-8 pt-24 text-sm leading-relaxed text-gray-800">
         <h1 className="mb-4 text-2xl font-bold">
           利用規約・プライバシーポリシー・免責事項
         </h1>

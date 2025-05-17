@@ -7,6 +7,7 @@ interface TwitterVideoSavePresenterProps {
   setTweetUrl: React.Dispatch<React.SetStateAction<string>>;
   videoUrl: string;
   setVideoUrl: React.Dispatch<React.SetStateAction<string>>;
+  error: string;
 }
 
 export function TwitterVideoSavePresenter({
@@ -15,6 +16,7 @@ export function TwitterVideoSavePresenter({
   setTweetUrl,
   videoUrl,
   setVideoUrl,
+  error,
 }: TwitterVideoSavePresenterProps) {
   return (
     <div className="flex min-h-screen flex-col ">
@@ -48,6 +50,7 @@ export function TwitterVideoSavePresenter({
               取得
             </button>
           </form>
+          {error && <div className="text-red-500 ">{error}</div>}
         </div>
         {/* 取得した動画のリンクを表示する部分 */}
         {videoUrl !== "" && (

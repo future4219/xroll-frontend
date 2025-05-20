@@ -9,6 +9,7 @@ interface TwitterVideoSavePresenterProps {
   videoUrl: string;
   setVideoUrl: React.Dispatch<React.SetStateAction<string>>;
   error: string;
+  isLoading: boolean;
 }
 
 export function TwitterVideoSavePresenter({
@@ -18,6 +19,7 @@ export function TwitterVideoSavePresenter({
   videoUrl,
   setVideoUrl,
   error,
+  isLoading,
 }: TwitterVideoSavePresenterProps) {
   return (
     <div className="flex min-h-screen flex-col ">
@@ -51,7 +53,17 @@ export function TwitterVideoSavePresenter({
               取得
             </button>
           </form>
-          {error && <div className="text-red-500 ">{error}</div>}
+          {error && (
+            <div className="mt-4 mb-2 text-sm text-red-500">{error}</div>
+          )}
+          {isLoading && (
+            <div className="mt-4 flex flex-col items-center">
+              <p className="mb-2 text-sm text-gray-600">
+                動画を取得中です。しばらくお待ちください...
+              </p>
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-gray-500"></div>
+            </div>
+          )}
         </div>
         <AdBanner />
         {/* 取得した動画のリンクを表示する部分 */}

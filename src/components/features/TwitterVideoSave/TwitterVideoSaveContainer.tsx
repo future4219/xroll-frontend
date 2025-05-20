@@ -7,9 +7,18 @@ export function TwitterVideoSaveContainer() {
   const [tweetUrl, setTweetUrl] = useState<string>("");
   const [videoUrl, setVideoUrl] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const getTwitterVideoByUrl = async (url: string) => {
     try {
+      if (!url) {
+        setError("URLを入力してください。");
+        return;
+      }
+
+      setError("");
+      setIsLoading(true);
+
       const response = await axios.get(`${apiUrl}/twitter/get-video-url`, {
         params: { url: url },
       });
@@ -29,6 +38,7 @@ export function TwitterVideoSaveContainer() {
       }
       console.error("APIエラー:", error);
     }
+    setIsLoading(false);
   };
 
   console.log(error);
@@ -40,6 +50,7 @@ export function TwitterVideoSaveContainer() {
       videoUrl={videoUrl}
       setVideoUrl={setVideoUrl}
       error={error}
+      isLoading={isLoading}
     />
   );
 }

@@ -1,4 +1,5 @@
 import AdBanner from "@/components/ads/juicyAds";
+import JuicyAdsPopup from "@/components/ads/juicyAdsPopup";
 import VideoItem from "@/components/features/MainVideoList/VideoItem";
 import { Header } from "@/components/ui/Header";
 import { Video } from "@/entities/video/entity";
@@ -27,6 +28,38 @@ export function MainVideoListPresenter({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isMuted, setIsMuted] = useState(true);
   const hasRestoredRef = useRef(false);
+  const [showAd, setShowAd] = useState(true);
+  const [countdown, setCountdown] = useState(5);
+  const [canClose, setCanClose] = useState(false);
+
+  // 広告の表示後にカウントダウン開始
+  useEffect(() => {
+    if (!showAd) return;
+
+    if (countdown === 0) {
+      setCanClose(true);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [countdown, showAd]);
+
+  // 定期的に広告を表示するためのカウントダウンと✕ボタンの制御
+  // useEffect(() => {
+  //   if (!showAd && canClose) {
+  //     const timer = setTimeout(() => {
+  //       setCountdown(5); // カウントダウン初期化
+  //       setCanClose(false); // ✕ボタンを非表示に
+  //       setShowAd(true); // 広告再表示
+  //     }, 60_000); // 1分後（60000ms）
+
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [showAd, canClose]);
 
   // activeIndex を localStorage に保存
   useEffect(() => {
@@ -36,7 +69,23 @@ export function MainVideoListPresenter({
   // マウント時に保存された activeIndex に基づいてスクロール位置を復元
   useLayoutEffect(() => {
     if (!hasRestoredRef.current && containerRef.current && videos.length > 0) {
-      containerRef.current.scrollTop = activeIndex * window.innerHeight;
+      // 動画が更新されたかどうかを localStorage の lastUpdatedAt と比較
+      if (
+        localStorage.getItem("lastUpdatedAt") !==
+        videos[0].created_at?.toString()
+      ) {
+        // 動画が更新された場合、activeIndex を 0 にリセット
+        setActiveIndex(0);
+        containerRef.current.scrollTop = 0;
+      } else {
+        // 動画が更新されていない場合、保存された activeIndex に基づいてスクロール位置を復元
+        containerRef.current.scrollTop = activeIndex * window.innerHeight;
+      }
+
+      localStorage.setItem(
+        "lastUpdatedAt",
+        videos[0].created_at?.toString() || "",
+      );
       hasRestoredRef.current = true;
     }
   }, [videos]);
@@ -74,6 +123,7 @@ export function MainVideoListPresenter({
 
   return (
     <div>
+      <JuicyAdsPopup />
       <div className="relative">
         {/* 固定のタブボタン領域 */}
         {/* <TabNavigation /> */}

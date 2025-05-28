@@ -1,3 +1,5 @@
+import InterstitialAd from "@/components/ads/InterstitialAd";
+import JuicyAdsPopup from "@/components/ads/juicyAdsPopup";
 import VideoItem from "@/components/features/MainVideoList/VideoItem";
 import { Header } from "@/components/ui/Header";
 import { Video } from "@/entities/video/entity";
@@ -54,6 +56,7 @@ export function LikeVideoListPresenter({
 
   return (
     <div className="bg-black">
+      <JuicyAdsPopup />
       {isVideoModalOpen ? (
         <div className="relative">
           <Header />

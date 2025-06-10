@@ -97,7 +97,25 @@ export function SidebarMenu() {
                     className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
                   >
                     <IoIosBook className="text-white" size={30} />
-                    <span className="text-white">免責事項・ポリシー</span>
+                    <span className="text-white">規約・免責事項・ポリシー</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/dmca"
+                    className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
+                  >
+                    <IoIosBook className="text-white" size={30} />
+                    <span className="text-white">DMCA</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/usc2257"
+                    className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
+                  >
+                    <IoIosBook className="text-white" size={30} />
+                    <span className="text-white">18 USC 2257 Statement</span>
                   </a>
                 </li>
               </ul>

@@ -2,6 +2,7 @@ import AdBanner from "@/components/ads/juicyAds";
 import JuicyAdsPopup from "@/components/ads/juicyAdsPopup";
 import VideoItem from "@/components/features/MainVideoList/VideoItem";
 import { Header } from "@/components/ui/Header";
+import PopupManager from "@/components/ui/PopupManager";
 import { Video } from "@/entities/video/entity";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
@@ -31,6 +32,22 @@ export function MainVideoListPresenter({
   const [showAd, setShowAd] = useState(true);
   const [countdown, setCountdown] = useState(5);
   const [canClose, setCanClose] = useState(false);
+  const [showTermsOfService, setShowTermsOfService] = useState(false);
+
+  // マウント時に localStorage を確認
+  useEffect(() => {
+    const agreed = localStorage.getItem("agreedToTerms");
+    if (!agreed) {
+      // 一度も同意していなければ true にしてポップアップを出す
+      setShowTermsOfService(true);
+    }
+  }, []);
+
+  // 同意ボタン押下時に呼ばれるハンドラ
+  const handleAgree = () => {
+    localStorage.setItem("agreedToTerms", "true");
+    setShowTermsOfService(false);
+  };
 
   // 広告の表示後にカウントダウン開始
   useEffect(() => {
@@ -123,7 +140,47 @@ export function MainVideoListPresenter({
 
   return (
     <div>
-      <JuicyAdsPopup />
+      {showTermsOfService && (
+        <PopupManager
+          initialDelay={0}
+          enableCountdown={false} // カウントダウン不要
+          showCloseButton={false} // ✕ボタン不要
+        >
+          <div className="max-w-md rounded-xl bg-white p-4 text-black shadow-md">
+            <h2 className="mb-2 text-lg font-bold">利用規約</h2>
+            <ul className="list-outside list-disc space-y-2 pl-5">
+              <li>当サイトは18歳未満の方のご利用を固くお断りしています。</li>
+              <li>
+                以下のような違法・不適切コンテンツを発見した場合は、
+                お手数ですが運営までご通報ください。
+                <ul className="list-outside list-disc space-y-1 pl-8">
+                  <li>児童ポルノまたは未成年者が登場するコンテンツ</li>
+                  <li>性的暴力・同意のない行為を描いたコンテンツ</li>
+                  <li>法律に反するその他の素材</li>
+                </ul>
+              </li>
+              <li>
+                当サイトは動画へのリンク提供のみを行っており、
+                18&nbsp;U.S.C.&nbsp;§2257（記録保持義務）および
+                DMCA（著作権侵害対応）について一切の責任を負いません。
+              </li>
+            </ul>
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={handleAgree}
+                className="rounded-md bg-blue-500 py-2 px-6 font-medium text-white transition hover:bg-blue-600"
+              >
+                同意して続行
+              </button>
+            </div>
+          </div>
+        </PopupManager>
+      )}
+
+      <PopupManager>
+        <AdBanner />
+      </PopupManager>
+      
       <div className="relative">
         {/* 固定のタブボタン領域 */}
         {/* <TabNavigation /> */}

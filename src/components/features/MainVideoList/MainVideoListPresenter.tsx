@@ -180,7 +180,7 @@ export function MainVideoListPresenter({
       <PopupManager>
         <AdBanner />
       </PopupManager>
-      
+
       <div className="relative">
         {/* 固定のタブボタン領域 */}
         {/* <TabNavigation /> */}
@@ -190,12 +190,24 @@ export function MainVideoListPresenter({
           ref={containerRef}
           className="h-screen w-full snap-y snap-mandatory overflow-y-auto bg-black pt-20"
         >
-          {videos.map((video, index) => {
-            // インデックス差によるレンダリング制御（ここでは±10）
-            const shouldRenderVideo = Math.abs(index - activeIndex) <= 10;
-            return (
-              <>
-                {/* {(index + 1) % 3 === 0 && (
+          {videos.length == 0 && (
+            <div className="flex h-screen flex-col items-center justify-center bg-black px-4">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-white border-t-transparent"></div>
+              <p className="mt-4 text-center text-sm leading-snug text-white">
+                動画を読み込み中...
+              </p>
+              <p className="mt-2 max-w-xs text-center text-sm text-gray-400">
+                ネットワーク状況が不安定な場合、読み込みに時間がかかることがあります。
+              </p>
+            </div>
+          )}
+          {videos.length !== 0 &&
+            videos.map((video, index) => {
+              // インデックス差によるレンダリング制御（ここでは±10）
+              const shouldRenderVideo = Math.abs(index - activeIndex) <= 10;
+              return (
+                <>
+                  {/* {(index + 1) % 3 === 0 && (
                   <VideoItem
                     setVideos={setVideos}
                     video={video}
@@ -208,21 +220,21 @@ export function MainVideoListPresenter({
                     isAd={true} // 3件ごとに広告を表示するフラグ
                   />
                 )} */}
-                <VideoItem
-                  key={video.id}
-                  setVideos={setVideos}
-                  video={video}
-                  isActive={index === activeIndex}
-                  isMuted={isMuted}
-                  setIsMuted={setIsMuted}
-                  shouldRenderVideo={shouldRenderVideo}
-                  likeVideo={likeVideo}
-                  commentVideo={commentVideo}
-                  isAd={false} // 3件ごとに広告を表示するフラグ
-                />
-              </>
-            );
-          })}
+                  <VideoItem
+                    key={video.id}
+                    setVideos={setVideos}
+                    video={video}
+                    isActive={index === activeIndex}
+                    isMuted={isMuted}
+                    setIsMuted={setIsMuted}
+                    shouldRenderVideo={shouldRenderVideo}
+                    likeVideo={likeVideo}
+                    commentVideo={commentVideo}
+                    isAd={false} // 3件ごとに広告を表示するフラグ
+                  />
+                </>
+              );
+            })}
         </div>
       </div>
     </div>

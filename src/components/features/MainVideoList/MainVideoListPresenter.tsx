@@ -140,7 +140,7 @@ export function MainVideoListPresenter({
 
   return (
     <div>
-      {showTermsOfService && (
+      {/* {showTermsOfService && (
         <PopupManager
           initialDelay={0}
           enableCountdown={false} // カウントダウン不要
@@ -175,7 +175,7 @@ export function MainVideoListPresenter({
             </div>
           </div>
         </PopupManager>
-      )}
+      )} */}
 
       <PopupManager>
         <AdBanner />

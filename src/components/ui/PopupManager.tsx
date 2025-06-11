@@ -54,7 +54,7 @@ const PopupManager: React.FC<PopupManagerProps> = ({
               {canClose ? (
                 <button
                   onClick={() => setVisible(false)}
-                  className="text-gray-600 hover:text-gray-800"
+                  className=" h-9 text-xs text-black hover:text-gray-800"
                 >
                   ✕
                 </button>

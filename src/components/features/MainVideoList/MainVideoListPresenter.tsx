@@ -87,17 +87,17 @@ export function MainVideoListPresenter({
   useLayoutEffect(() => {
     if (!hasRestoredRef.current && containerRef.current && videos.length > 0) {
       // 動画が更新されたかどうかを localStorage の lastUpdatedAt と比較
-      if (
-        localStorage.getItem("lastUpdatedAt") !==
-        videos[0].created_at?.toString()
-      ) {
-        // 動画が更新された場合、activeIndex を 0 にリセット
-        // setActiveIndex(0);
-        // containerRef.current.scrollTop = 0;
-      } else {
+      // if (
+      //   localStorage.getItem("lastUpdatedAt") !==
+      //   videos[0].created_at?.toString()
+      // ) {
+      //   // 動画が更新された場合、activeIndex を 0 にリセット
+      //   // setActiveIndex(0);
+      //   // containerRef.current.scrollTop = 0;
+      // } else {
         // 動画が更新されていない場合、保存された activeIndex に基づいてスクロール位置を復元
         containerRef.current.scrollTop = activeIndex * window.innerHeight;
-      }
+      // }
 
       localStorage.setItem(
         "lastUpdatedAt",

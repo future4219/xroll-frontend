@@ -24,6 +24,8 @@ export function MainVideoListContainer() {
 
       console.log(response.data);
       // 取得した動画を既存のリストに連結
+
+
       setVideos((prev) => [...prev, ...response.data.videos]);
       // オフセットを更新
       setOffset(currentOffset + limit);

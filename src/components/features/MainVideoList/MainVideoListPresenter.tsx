@@ -92,8 +92,8 @@ export function MainVideoListPresenter({
         videos[0].created_at?.toString()
       ) {
         // 動画が更新された場合、activeIndex を 0 にリセット
-        setActiveIndex(0);
-        containerRef.current.scrollTop = 0;
+        // setActiveIndex(0);
+        // containerRef.current.scrollTop = 0;
       } else {
         // 動画が更新されていない場合、保存された activeIndex に基づいてスクロール位置を復元
         containerRef.current.scrollTop = activeIndex * window.innerHeight;

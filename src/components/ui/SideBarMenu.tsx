@@ -7,6 +7,7 @@ import {
   IoMdMenu,
   IoMdSave,
 } from "react-icons/io";
+import { MdLiveTv } from "react-icons/md";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -64,6 +65,15 @@ export function SidebarMenu() {
               </div>
 
               <ul className="space-y-3">
+                <li>
+                  <a
+                    href="https://go.rmhfrtnd.com?userId=3a43ec976d7f513c2bd3e3019041edf8c12c016056dc22074d25c7907abb93fc"
+                    className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
+                  >
+                    <MdLiveTv className="text-white" size={30} />
+                    <span className="text-white">ライブチャット</span>
+                  </a>
+                </li>
                 <li>
                   <a
                     href="/"

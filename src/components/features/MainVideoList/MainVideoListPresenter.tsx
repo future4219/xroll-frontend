@@ -177,9 +177,9 @@ export function MainVideoListPresenter({
         </PopupManager>
       )} */}
 
-      <PopupManager>
+      {/* <PopupManager>
         <AdBanner />
-      </PopupManager>
+      </PopupManager> */}
 
       <div className="relative">
         {/* 固定のタブボタン領域 */}

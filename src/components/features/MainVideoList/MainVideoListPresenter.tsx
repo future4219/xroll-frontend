@@ -184,8 +184,6 @@ export function MainVideoListPresenter({
         <AdBanner />
       </PopupManager>
 
-      <StripcashPrPopup />
-
       <div className="relative">
         {/* 固定のタブボタン領域 */}
         {/* <TabNavigation /> */}

@@ -7,6 +7,7 @@ type PopupManagerProps = {
   enableCountdown?: boolean; // カウントダウンUIを有効にするか
   countdownSeconds?: number; // カウントダウン秒数
   showCloseButton?: boolean; // ✕ボタンを表示するか
+  subtleCloseButton?: boolean; // ✕ボタンを控えめにするか
 };
 
 const PopupManager: React.FC<PopupManagerProps> = ({
@@ -15,6 +16,7 @@ const PopupManager: React.FC<PopupManagerProps> = ({
   enableCountdown = true,
   countdownSeconds = 5,
   showCloseButton = true,
+  subtleCloseButton = false,
 }) => {
   const [visible, setVisible] = useState(false);
   const [countdown, setCountdown] = useState(countdownSeconds);
@@ -54,7 +56,11 @@ const PopupManager: React.FC<PopupManagerProps> = ({
               {canClose ? (
                 <button
                   onClick={() => setVisible(false)}
-                  className=" h-9 text-xs text-black hover:text-gray-800"
+                  className={`text-xs ${
+                    subtleCloseButton
+                      ? "h-9 text-black hover:text-gray-600"
+                      : "w-3 bg-gray-400 text-black hover:text-gray-800"
+                  }`}
                 >
                   ✕
                 </button>

@@ -65,7 +65,7 @@ export function SidebarMenu() {
               </div>
 
               <ul className="space-y-3">
-                <li>
+                {/* <li>
                   <a
                     href="https://go.rmhfrtnd.com?userId=3a43ec976d7f513c2bd3e3019041edf8c12c016056dc22074d25c7907abb93fc"
                     className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
@@ -73,7 +73,22 @@ export function SidebarMenu() {
                     <MdLiveTv className="text-white" size={30} />
                     <span className="text-white">ライブチャット</span>
                   </a>
+                </li> */}
+                <li>
+                  <a
+                    href="https://go.rmhfrtnd.com?userId=3a43ec976d7f513c2bd3e3019041edf8c12c016056dc22074d25c7907abb93fc"
+                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-700"
+                  >
+                    <MdLiveTv className="text-white" size={30} />
+                    <span className="flex items-center gap-1 whitespace-nowrap text-sm text-white">
+                      ライブチャット
+                      <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs text-white">
+                        セール中
+                      </span>
+                    </span>
+                  </a>
                 </li>
+
                 <li>
                   <a
                     href="/"

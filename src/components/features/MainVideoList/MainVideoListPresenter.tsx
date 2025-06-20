@@ -1,5 +1,6 @@
 import AdBanner from "@/components/ads/juicyAds";
 import JuicyAdsPopup from "@/components/ads/juicyAdsPopup";
+import { StripcashPrPopup } from "@/components/ads/StripcashPrPopup";
 import VideoItem from "@/components/features/MainVideoList/VideoItem";
 import { Header } from "@/components/ui/Header";
 import PopupManager from "@/components/ui/PopupManager";
@@ -95,8 +96,8 @@ export function MainVideoListPresenter({
       //   // setActiveIndex(0);
       //   // containerRef.current.scrollTop = 0;
       // } else {
-        // 動画が更新されていない場合、保存された activeIndex に基づいてスクロール位置を復元
-        containerRef.current.scrollTop = activeIndex * window.innerHeight;
+      // 動画が更新されていない場合、保存された activeIndex に基づいてスクロール位置を復元
+      containerRef.current.scrollTop = activeIndex * window.innerHeight;
       // }
 
       localStorage.setItem(
@@ -177,9 +178,13 @@ export function MainVideoListPresenter({
         </PopupManager>
       )} */}
 
-      <PopupManager>
+      <PopupManager
+        subtleCloseButton={true}
+      >
         <AdBanner />
       </PopupManager>
+
+      <StripcashPrPopup />
 
       <div className="relative">
         {/* 固定のタブボタン領域 */}

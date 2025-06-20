@@ -178,11 +178,11 @@ export function MainVideoListPresenter({
         </PopupManager>
       )} */}
 
-      <PopupManager
-        subtleCloseButton={true}
-      >
+      <PopupManager subtleCloseButton={true}>
         <AdBanner />
       </PopupManager>
+
+      <StripcashPrPopup />
 
       <div className="relative">
         {/* 固定のタブボタン領域 */}

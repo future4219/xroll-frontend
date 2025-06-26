@@ -4,6 +4,7 @@ import VideoItem from "@/components/features/MainVideoList/VideoItem";
 import { Header } from "@/components/ui/Header";
 import { Video } from "@/entities/video/entity";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLanguage } from "@/utils/LanguageContext";
 
 interface LikeVideoListPresenterProps {
   setLikeVideos: React.Dispatch<React.SetStateAction<Video[]>>;
@@ -18,6 +19,7 @@ export function LikeVideoListPresenter({
   likeVideo,
   commentVideo,
 }: LikeVideoListPresenterProps) {
+  const { t } = useLanguage();
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState<number>(0);
@@ -119,7 +121,7 @@ export function LikeVideoListPresenter({
 
           {likeVideos.length === 0 && (
             <div className="flex h-screen items-center justify-center font-bold text-white">
-              いいねした動画はありません
+              {t('noLikedVideos')}
             </div>
           )}
         </div>

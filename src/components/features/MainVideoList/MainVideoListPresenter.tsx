@@ -29,6 +29,7 @@ export function MainVideoListPresenter({
   });
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isMuted, setIsMuted] = useState(true);
+  const [isThumbnailView, setIsThumbnailView] = useState(false);
   const hasRestoredRef = useRef(false);
   const [showAd, setShowAd] = useState(true);
   const [countdown, setCountdown] = useState(5);
@@ -111,7 +112,7 @@ export function MainVideoListPresenter({
   // スクロール時に各動画要素の中心との距離を計算して、最も近い動画を activeIndex に設定
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container || isThumbnailView) return;
     const handleScroll = () => {
       const children = Array.from(container.children) as HTMLElement[];
       let closestIndex = 0;
@@ -130,7 +131,7 @@ export function MainVideoListPresenter({
     };
     container.addEventListener("scroll", handleScroll);
     return () => container.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isThumbnailView]);
 
   // activeIndex が動画リストの最後に到達したら loadMore を呼び出す
   useEffect(() => {
@@ -138,6 +139,13 @@ export function MainVideoListPresenter({
       loadMore();
     }
   }, [activeIndex, videos.length, loadMore]);
+
+  // サムネイル画面からリール画面に戻ったときにスクロール位置を調整
+  useLayoutEffect(() => {
+    if (!isThumbnailView && containerRef.current) {
+      containerRef.current.scrollTop = activeIndex * window.innerHeight;
+    }
+  }, [isThumbnailView, activeIndex]);
 
   return (
     <div>
@@ -188,29 +196,67 @@ export function MainVideoListPresenter({
         {/* 固定のタブボタン領域 */}
         {/* <TabNavigation /> */}
         <Header />
-        {/* ヘッダーの高さ分、上部にパディングを追加（例：p-t-20） */}
-        <div
-          ref={containerRef}
-          className="h-screen w-full snap-y snap-mandatory overflow-y-auto bg-black pt-20"
-        >
-          {videos.length == 0 && (
-            <div className="flex h-screen flex-col items-center justify-center bg-black px-4">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-white border-t-transparent"></div>
-              <p className="mt-4 text-center text-sm leading-snug text-white">
-                動画を読み込み中...
-              </p>
-              <p className="mt-2 max-w-xs text-center text-sm text-gray-400">
-                ネットワーク状況が不安定な場合、読み込みに時間がかかることがあります。
-              </p>
-            </div>
-          )}
-          {videos.length !== 0 &&
-            videos.map((video, index) => {
-              // インデックス差によるレンダリング制御（ここでは±10）
-              const shouldRenderVideo = Math.abs(index - activeIndex) <= 10;
-              return (
-                <>
-                  {/* {(index + 1) % 3 === 0 && (
+        <div className="fixed top-16 z-40 flex w-full justify-center gap-2">
+          <button
+            onClick={() => setIsThumbnailView(false)}
+            className={`rounded px-3 py-1 text-sm text-white ${
+              isThumbnailView ? "bg-gray-700" : "bg-blue-500"
+            }`}
+          >
+            リール
+          </button>
+          <button
+            onClick={() => setIsThumbnailView(true)}
+            className={`rounded px-3 py-1 text-sm text-white ${
+              isThumbnailView ? "bg-blue-500" : "bg-gray-700"
+            }`}
+          >
+            サムネから選ぶ
+          </button>
+        </div>
+        {/* ヘッダーの高さ分、上部にパディングを追加 */}
+        {isThumbnailView ? (
+          <div className="grid grid-cols-3 gap-[2px] bg-black pt-32 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {videos.map((video, index) => (
+              <div
+                key={video.id}
+                onClick={() => {
+                  setActiveIndex(index);
+                  setIsThumbnailView(false);
+                }}
+                className="mb-1 cursor-pointer"
+              >
+                <img
+                  src={video.thumbnail_url}
+                  alt={`Video ${index}`}
+                  className="mx-auto aspect-[9/16] w-full bg-black object-contain shadow-sm"
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div
+            ref={containerRef}
+            className="h-screen w-full snap-y snap-mandatory overflow-y-auto bg-black pt-32"
+          >
+            {videos.length == 0 && (
+              <div className="flex h-screen flex-col items-center justify-center bg-black px-4">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-white border-t-transparent"></div>
+                <p className="mt-4 text-center text-sm leading-snug text-white">
+                  動画を読み込み中...
+                </p>
+                <p className="mt-2 max-w-xs text-center text-sm text-gray-400">
+                  ネットワーク状況が不安定な場合、読み込みに時間がかかることがあります。
+                </p>
+              </div>
+            )}
+            {videos.length !== 0 &&
+              videos.map((video, index) => {
+                // インデックス差によるレンダリング制御（ここでは±10）
+                const shouldRenderVideo = Math.abs(index - activeIndex) <= 10;
+                return (
+                  <>
+                    {/* {(index + 1) % 3 === 0 && (
                   <VideoItem
                     setVideos={setVideos}
                     video={video}
@@ -223,22 +269,23 @@ export function MainVideoListPresenter({
                     isAd={true} // 3件ごとに広告を表示するフラグ
                   />
                 )} */}
-                  <VideoItem
-                    key={video.id}
-                    setVideos={setVideos}
-                    video={video}
-                    isActive={index === activeIndex}
-                    isMuted={isMuted}
-                    setIsMuted={setIsMuted}
-                    shouldRenderVideo={shouldRenderVideo}
-                    likeVideo={likeVideo}
-                    commentVideo={commentVideo}
-                    isAd={false} // 3件ごとに広告を表示するフラグ
-                  />
-                </>
-              );
-            })}
-        </div>
+                    <VideoItem
+                      key={video.id}
+                      setVideos={setVideos}
+                      video={video}
+                      isActive={index === activeIndex}
+                      isMuted={isMuted}
+                      setIsMuted={setIsMuted}
+                      shouldRenderVideo={shouldRenderVideo}
+                      likeVideo={likeVideo}
+                      commentVideo={commentVideo}
+                      isAd={false} // 3件ごとに広告を表示するフラグ
+                    />
+                  </>
+                );
+              })}
+          </div>
+        )}
       </div>
     </div>
   );

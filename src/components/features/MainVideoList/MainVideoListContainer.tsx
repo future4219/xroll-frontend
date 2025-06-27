@@ -18,12 +18,14 @@ export function MainVideoListContainer() {
   ) => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`${apiUrl}/videos`, {
+      const response = await axios.get(`${apiUrl}/videos/search`, {
         params: { offset: currentOffset, limit },
       });
 
       console.log(response.data);
       // 取得した動画を既存のリストに連結
+
+
       setVideos((prev) => [...prev, ...response.data.videos]);
       // オフセットを更新
       setOffset(currentOffset + limit);
@@ -49,7 +51,7 @@ export function MainVideoListContainer() {
     }
 
     try {
-      const response = await axios.post(`${apiUrl}/videos/${id}/like`);
+      const response = await axios.post(`${apiUrl}/videos/like/${id}`);
       console.log(response.data);
       localStorage.setItem(`liked_${id}`, "true");
     } catch (error) {
@@ -82,7 +84,7 @@ export function MainVideoListContainer() {
 
   const commentVideo = async (id: number, comment: string) => {
     try {
-      const response = await axios.post(`${apiUrl}/videos/${id}/comment`, {
+      const response = await axios.post(`${apiUrl}/videos/comment/${id}`, {
         comment,
       });
       console.log(response.data);

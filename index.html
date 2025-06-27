@@ -4,8 +4,26 @@
     <meta charSet="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="./public/xroll_icon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Twitterで話題の人気動画をリール形式で次々再生できる動画ビューアー。気に入った動画は保存・いいねして、あとでまとめて楽しめます。"
+    />
+    <meta property="og:title" content="Xroll" />
+    <meta
+      property="og:description"
+      content="Twitter動画のリンクを保存・共有できる動画リストサービス"
+    />
     <title>Xroll</title>
   </head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0DDDJK3QD5"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-0DDDJK3QD5');
+  </script>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

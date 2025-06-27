@@ -14,7 +14,7 @@
 git pull
 
 # ビルド
-npm run build
+NODE_OPTIONS="--max-old-space-size=8192" npm run build
 
 # デプロイ（ビルドしたファイルをNginxの公開ディレクトリにコピー）
 sudo cp -r ./dist /var/www/xroll-frontend/

@@ -1,3 +1,5 @@
+import InterstitialAd from "@/components/ads/InterstitialAd";
+import JuicyAdsPopup from "@/components/ads/juicyAdsPopup";
 import VideoItem from "@/components/features/MainVideoList/VideoItem";
 import { Header } from "@/components/ui/Header";
 import { Video } from "@/entities/video/entity";
@@ -54,6 +56,7 @@ export function LikeVideoListPresenter({
 
   return (
     <div className="bg-black">
+      <JuicyAdsPopup />
       {isVideoModalOpen ? (
         <div className="relative">
           <Header />
@@ -84,6 +87,7 @@ export function LikeVideoListPresenter({
                   shouldRenderVideo={shouldRenderVideo}
                   likeVideo={likeVideo}
                   commentVideo={commentVideo}
+                  isAd={false} // 広告は表示しない
                 />
               );
             })}
@@ -94,25 +98,25 @@ export function LikeVideoListPresenter({
           {/* 固定のタブ領域 */}
           <Header />
           {/* コンテンツ領域 */}
-          <div className="columns-2 gap-[2px] bg-black sm:columns-3 md:columns-4 lg:columns-5">
-            {likeVideos.length > 0 &&
-              likeVideos.map((video, index) => (
-                <div
-                  key={video.id}
-                  onClick={() => {
-                    setActiveIndex(index);
-                    setIsVideoModalOpen(true);
-                  }}
-                  className="mb-[2px] cursor-pointer break-inside-avoid"
-                >
-                  <img
-                    src={video.thumbnail_url}
-                    alt={`Video ${index}`}
-                    className="h-auto w-full shadow-sm"
-                  />
-                </div>
-              ))}
+          <div className="grid grid-cols-3 gap-[2px] bg-black sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {likeVideos.map((video, index) => (
+              <div
+                key={video.id}
+                onClick={() => {
+                  setActiveIndex(index);
+                  setIsVideoModalOpen(true);
+                }}
+                className="mb-1 cursor-pointer"
+              >
+                <img
+                  src={video.thumbnail_url}
+                  alt={`Video ${index}`}
+                  className="mx-auto aspect-[9/16] w-full bg-black object-contain shadow-sm"
+                />
+              </div>
+            ))}
           </div>
+
           {likeVideos.length === 0 && (
             <div className="flex h-screen items-center justify-center font-bold text-white">
               いいねした動画はありません

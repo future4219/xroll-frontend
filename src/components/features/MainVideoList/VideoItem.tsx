@@ -213,7 +213,7 @@ function VideoItem({
                 className="absolute bottom-40 right-4 flex flex-col items-center space-y-6 text-white"
                 onClick={(e) => e.stopPropagation()}
               >
-                <button
+                {video.tweet_url && <button
                   onClick={handleTwitterIconClick}
                   className="flex flex-col items-center"
                 >
@@ -224,7 +224,7 @@ function VideoItem({
                       className="h-7 w-7 object-contain"
                     />
                   </div>
-                </button>
+                </button>}
 
                 <button
                   onClick={handleLike}

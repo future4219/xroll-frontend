@@ -121,17 +121,21 @@ export function MainVideoListPresenter({
     }
 
     const storedIndex = Number(localStorage.getItem("lastActiveIndex")) || 0;
-    setActiveIndex(storedIndex); // これを明示的に入れる！
+    setActiveIndex(storedIndex);
 
-    const restore = () => {
-      if (!containerRef.current) return;
-      containerRef.current.scrollTop = storedIndex * window.innerHeight;
-      hasRestoredRef.current = true;
-    };
+    const waitUntilReady = setInterval(() => {
+      const children = containerRef.current?.children ?? [];
+      if (children.length >= videos.length) {
+        clearInterval(waitUntilReady);
+        requestAnimationFrame(() => {
+          if (!containerRef.current) return;
+          containerRef.current.scrollTop = storedIndex * window.innerHeight;
+          hasRestoredRef.current = true;
+        });
+      }
+    }, 100);
 
-    setTimeout(() => {
-      requestAnimationFrame(restore);
-    }, 200);
+    return () => clearInterval(waitUntilReady);
   }, [videos, view]);
 
   // スクロール時に各動画要素の中心との距離を計算して、最も近い動画を activeIndex に設定

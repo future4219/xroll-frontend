@@ -1,6 +1,7 @@
 import AdBanner from "@/components/ads/juicyAds";
 import JuicyAdsPopup from "@/components/ads/juicyAdsPopup";
 import { StripcashPrPopup } from "@/components/ads/StripcashPrPopup";
+import { UpdateNoticePopup } from "@/components/ads/UpdateNoticePopup";
 import VideoItem from "@/components/features/MainVideoList/VideoItem";
 import { Header } from "@/components/ui/Header";
 import PopupManager from "@/components/ui/PopupManager";
@@ -183,6 +184,7 @@ export function MainVideoListPresenter({
       </PopupManager>
 
       <StripcashPrPopup />
+      <UpdateNoticePopup />
 
       <div className="relative">
         {/* 固定のタブボタン領域 */}

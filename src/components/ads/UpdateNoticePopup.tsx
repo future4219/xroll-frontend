@@ -5,28 +5,23 @@ export function UpdateNoticePopup() {
   const [shouldShow, setShouldShow] = useState(false);
   const now = new Date();
 
-  // 告知の表示期間（適宜変更してな）
+  // 表示期間（必要に応じて変更）
   const start = new Date("2025-07-01T00:00:00+09:00");
   const end = new Date("2025-07-03T23:59:59+09:00");
 
+  // 期間外なら何も表示しない
   if (now < start || now > end) return null;
 
+  // 一度でも表示したら、もう出さない
   useEffect(() => {
-    const lastShown = localStorage.getItem("update-popup-last-shown");
-    const now = Date.now();
-
-    if (!lastShown || now - Number(lastShown) > 24 * 60 * 60 * 1000) {
-      // 24時間経ってたら表示
+    const alreadyShown = localStorage.getItem("update-popup-last-shown");
+    if (!alreadyShown) {
       setShouldShow(true);
     }
   }, []);
 
-  const handleClickTweet = () => {
-    window.open("https://x.com/xxxx/status/1234567890123456789", "_blank");
-  };
-
   const handleClose = () => {
-    localStorage.setItem("update-popup-last-shown", String(Date.now()));
+    localStorage.setItem("update-popup-last-shown", "true");
     setShouldShow(false);
   };
 
@@ -51,14 +46,14 @@ export function UpdateNoticePopup() {
         </h2>
 
         <ul className="mb-4 list-disc space-y-2 pl-5 text-sm text-gray-700">
+          <li>リール形式とサムネイル形式を切り替えられるように対応</li>
           <li>
             動画カードに
             <span className="font-medium">出典ツイート</span>へのリンクを追加
           </li>
           <li>
             「いいねした動画」から遷移した際、
-            <span className="font-medium">コメント数が0になる不具合</span>
-            を修正
+            <span className="font-medium">コメント数が0になる不具合</span>を修正
           </li>
         </ul>
       </div>

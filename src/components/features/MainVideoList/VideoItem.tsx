@@ -171,7 +171,6 @@ function VideoItem({
   const handleTwitterIconClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     const tweetUrl = video.tweet_url;
-    console.log(video.tweet_url);
     window.open(tweetUrl, "_blank");
   };
 

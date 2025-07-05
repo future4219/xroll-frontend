@@ -75,7 +75,7 @@ export function LikeVideoListPresenter({
           >
             {likeVideos.map((video, index) => {
               // インデックス差によるレンダリング制御（ここでは±10）
-              const shouldRenderVideo = Math.abs(index - activeIndex) <= 10;
+              const shouldRenderVideo = Math.abs(index - activeIndex) <= 30;
               return (
                 <VideoItem
                   key={`${video.id}-${index}`}

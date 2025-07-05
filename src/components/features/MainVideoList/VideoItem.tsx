@@ -1,3 +1,4 @@
+import TwitterLogo from "@/components/ui/TwitterLogo.png";
 import AdBanner from "@/components/ads/juicyAds";
 import { CommentModal } from "@/components/features/MainVideoList/CommentModal";
 import { Video } from "@/entities/video/entity";
@@ -167,6 +168,12 @@ function VideoItem({
     return "";
   }, []);
 
+  const handleTwitterIconClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const tweetUrl = video.tweet_url;
+    window.open(tweetUrl, "_blank");
+  };
+
   // 両方の条件を満たす場合にコンテンツをレンダリング
   const shouldRenderContent = shouldRenderVideo && inView;
 
@@ -205,6 +212,19 @@ function VideoItem({
                 className="absolute bottom-40 right-4 flex flex-col items-center space-y-6 text-white"
                 onClick={(e) => e.stopPropagation()}
               >
+                {video.tweet_url && <button
+                  onClick={handleTwitterIconClick}
+                  className="flex flex-col items-center"
+                >
+                  <div className="flex h-6 w-8 items-center justify-center">
+                    <img
+                      src={TwitterLogo}
+                      alt="Twitter Logo"
+                      className="h-7 w-7 object-contain"
+                    />
+                  </div>
+                </button>}
+
                 <button
                   onClick={handleLike}
                   className="flex flex-col items-center"

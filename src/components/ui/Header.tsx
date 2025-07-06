@@ -20,9 +20,16 @@ export function Header({
   if (!view) {
     view = "reels"; // デフォルト値
   }
+  const isVideoList: boolean =
+    location.pathname === appUrl.likeVideoList ||
+    location.pathname === appUrl.mainVideoList;
 
   return (
-    <header className={`fixed top-0 left-0 z-50 w-full text-white`}>
+    <header
+      className={`fixed top-0 left-0 z-50 w-full text-white ${
+        !isVideoList && "bg-black"
+      } `}
+    >
       <div className="relative mx-auto flex h-16 max-w-5xl items-center justify-between ">
         {/* 左：ロゴとメニュー */}
         <div className="flex items-center ">
@@ -37,24 +44,26 @@ export function Header({
         </div>
 
         {/* 中央：リール / サムネイル切り替え */}
-        {isMainVideoList && <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 space-x-8  font-medium">
-          <Link
-            to={appUrl.mainVideoListWithView("reels")}
-            className={`pb-1 transition ${
-              view == "reels" ? "border-b-2 border-white" : "text-gray-300"
-            }`}
-          >
-            リール
-          </Link>
-          <Link
-            to={appUrl.mainVideoListWithView("thumbs")}
-            className={`pb-1 transition ${
-              view == "thumbs" ? "border-b-2 border-white" : "text-gray-300"
-            }`}
-          >
-            サムネイル
-          </Link>
-        </div>}
+        {isMainVideoList && (
+          <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 space-x-8  font-medium">
+            <Link
+              to={appUrl.mainVideoListWithView("reels")}
+              className={`pb-1 transition ${
+                view == "reels" ? "border-b-2 border-white" : "text-gray-300"
+              }`}
+            >
+              リール
+            </Link>
+            <Link
+              to={appUrl.mainVideoListWithView("thumbs")}
+              className={`pb-1 transition ${
+                view == "thumbs" ? "border-b-2 border-white" : "text-gray-300"
+              }`}
+            >
+              サムネイル
+            </Link>
+          </div>
+        )}
 
         {/* 右側の空き領域 */}
         <div className="w-8" />

@@ -1,4 +1,4 @@
-import AdBanner from "@/components/ads/juicyAds";
+import AdBanner, { AdBanner1097564 } from "@/components/ads/juicyAds";
 import JuicyAdsPopup from "@/components/ads/juicyAdsPopup";
 import { StripcashPrPopup } from "@/components/ads/StripcashPrPopup";
 import { UpdateNoticePopup } from "@/components/ads/UpdateNoticePopup";
@@ -129,7 +129,7 @@ export function MainVideoListPresenter({
   return (
     <div>
       <PopupManager subtleCloseButton>
-        <AdBanner />
+        <AdBanner1097564 />
       </PopupManager>
       <StripcashPrPopup />
       <UpdateNoticePopup />

@@ -40,6 +40,48 @@ const AdBanner = () => {
 export default AdBanner;
 
 
+export const AdBanner1097564 = () => {
+  const adRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!adRef.current) return;
+
+    // クリア（再マウント時に重複防止）
+    adRef.current.innerHTML = "";
+
+    // スクリプト読み込み
+    const script1 = document.createElement("script");
+    script1.src = "https://poweredby.jads.co/js/jads.js";
+    script1.async = true;
+    script1.setAttribute("data-cfasync", "false");
+
+    // <ins> 要素
+    const ins = document.createElement("ins");
+    ins.id = "1097564";
+    ins.setAttribute("data-width", "300");
+    ins.setAttribute("data-height", "250");
+
+    // 広告呼び出しスクリプト
+    const script2 = document.createElement("script");
+    script2.innerHTML = `(adsbyjuicy = window.adsbyjuicy || []).push({'adzone':1097564});`;
+    script2.async = true;
+    script2.setAttribute("data-cfasync", "false");
+
+    // DOM に挿入
+    adRef.current.appendChild(script1);
+    adRef.current.appendChild(ins);
+    adRef.current.appendChild(script2);
+  }, []);
+
+  return (
+    <div
+      ref={adRef}
+      className="flex h-[250px] w-full items-center justify-center bg-black"
+    />
+  );
+};
+
+
 
 declare global {
   interface Window {

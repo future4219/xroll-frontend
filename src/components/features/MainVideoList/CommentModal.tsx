@@ -77,7 +77,7 @@ export function CommentModal({
           </button>
         </div>
         <div className="mt-2 border-b"></div>
-        <div className="mt-4 flex-grow overflow-y-auto border-b">
+        <div className="mt-4 max-h-[400px] overflow-y-auto border-b">
           <div className="flex flex-col gap-4">
             {(!comments || comments.length === 0) && (
               <div className="py-4 text-center text-gray-500">

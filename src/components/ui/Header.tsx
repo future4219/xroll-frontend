@@ -1,4 +1,4 @@
-import { SidebarMenu } from "@/components/ui/SideBarMenu";
+import { SideBarMenuXroll } from "@/components/ui/SideBarMenuXroll";
 import logo from "@/components/ui/xroll.png";
 import { appUrl } from "@/config/url";
 import { Link, useLocation } from "react-router-dom";
@@ -33,7 +33,7 @@ export function Header({
       <div className="relative mx-auto flex h-16 max-w-5xl items-center justify-between ">
         {/* 左：ロゴとメニュー */}
         <div className="flex items-center ">
-          <SidebarMenu />
+          <SideBarMenuXroll />
           <Link to="/">
             <img
               src={logo}

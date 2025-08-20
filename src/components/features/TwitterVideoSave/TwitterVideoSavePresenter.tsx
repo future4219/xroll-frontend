@@ -93,6 +93,16 @@ export function TwitterVideoSavePresenter({
             当サイトは動画ファイルを直接保存しているわけではなく、Twitterに投稿された動画へのリンクを提供しています。
           </p>
         </div>
+
+        <div className="flex h-screen items-center justify-center bg-black">
+          <video
+            src="http://localhost:8000/api/gofile/proxy?url=https%3A%2F%2Fstore8.gofile.io%2Fdownload%2Fdirect%2F4fdc6f56-c6b0-4701-8659-514a901aa333%2Ftest2.mp4"
+            controls
+            autoPlay
+            playsInline
+            style={{ maxWidth: "100%", maxHeight: "100%" }}
+          />
+        </div>
       </main>
       <Footer />
     </div>

@@ -1,5 +1,5 @@
-import { GofilePresenter } from "@/components/features/Gofile/GofilePresenter";
+import { GofileContainer } from "@/components/features/Gofile/GofileContainer";
 
 export function Gofile() {
-  return <GofilePresenter />;
+  return <GofileContainer />;
 }

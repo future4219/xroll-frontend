@@ -7,12 +7,13 @@ import {
   IoMdMenu,
   IoMdSave,
 } from "react-icons/io";
+import { FaFileAlt } from "react-icons/fa";
 import { MdLiveTv } from "react-icons/md";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-export function SidebarMenu() {
+export function SideBarMenuXroll() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -114,6 +115,15 @@ export function SidebarMenu() {
                   >
                     <IoMdSave className="text-white" size={30} />
                     <span className="text-white">動画保存</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/gofile"
+                    className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
+                  >
+                    <FaFileAlt className="text-white" size={25} />
+                    <span className="text-white">Gofile</span>
                   </a>
                 </li>
                 <li>

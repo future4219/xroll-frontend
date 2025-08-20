@@ -12,7 +12,6 @@ export function VaultGrid({
   onShare: (it: VaultItem) => void;
   onToggleVisibility: (id: string) => void;
 }) {
-  console.log("VaultGrid items", items);
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((it) => (

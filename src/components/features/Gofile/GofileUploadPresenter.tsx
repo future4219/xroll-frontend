@@ -37,7 +37,6 @@ export function GofileUploadPresenter() {
         },
         timeout: 0,
       });
-      console.log(res.data);
       setProgress(100);
       setStatus("success");
       setMessage("アップロード完了");

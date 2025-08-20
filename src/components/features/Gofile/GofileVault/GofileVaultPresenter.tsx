@@ -194,7 +194,6 @@ export function GofileVaultPresenter() {
             user_id: USER_ID, // 認証から取得するのが正
             gofile_token: go.guestToken,
           });
-          console.log("POST /api/gofile/create success:", res.data);
           localStorage.setItem("userId", res.data.user_id!);
         } catch (e) {
           console.error("POST /api/gofile/create failed:", e);

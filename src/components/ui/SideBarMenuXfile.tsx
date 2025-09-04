@@ -10,9 +10,11 @@ import {
   IoIosSearch,
 } from "react-icons/io";
 import { IoCloudUploadOutline } from "react-icons/io5";
+import { AiOutlineUser } from "react-icons/ai";
 
 import { FaFileAlt } from "react-icons/fa";
 import { MdLiveTv } from "react-icons/md";
+import { CiUser } from "react-icons/ci";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -56,7 +58,7 @@ export function SideBarMenuXfile() {
             transition={{ type: "tween" }}
             className="fixed left-0 top-0 z-50 h-full w-64 bg-black px-3 shadow-lg "
           >
-            <div>
+            <div className="bg-black">
               <div className="mt-3 flex gap-3 p-2">
                 <button onClick={toggleMenu}>
                   <IoMdMenu className="h-6 w-6 text-white" />
@@ -67,6 +69,17 @@ export function SideBarMenuXfile() {
               </div>
 
               <ul className="mt-2 space-y-3">
+                <li>
+                  <a
+                    href={`${appUrl.gofileUser}?id=${localStorage.getItem(
+                      "userId",
+                    )}`}
+                    className="flex items-center gap-2 space-x-2 rounded p-2  hover:bg-gray-700"
+                  >
+                    <AiOutlineUser className="text-white" size={25} />
+                    <div className="text-white">マイページ</div>
+                  </a>
+                </li>
                 <li>
                   <a
                     href={appUrl.gofileVault}

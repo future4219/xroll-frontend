@@ -21,6 +21,7 @@ export function GofileWatchContainer() {
   const [error, setError] = useState<string | null>(null);
   const [item, setItem] = useState<WatchItem | undefined>(undefined);
 
+  const apiUrl = import.meta.env.VITE_API_URL;
   // resolve id from query string (?id=)
   const videoId = useMemo(() => {
     try {
@@ -44,7 +45,7 @@ export function GofileWatchContainer() {
       setError(null);
       try {
         const detail = await axios.get<GofileVideoRes>(
-          `http://localhost:8000/api/gofile/video/${videoId}`,
+          `${apiUrl}/gofile/video/${videoId}`,
         );
         if (aborted) return;
         const v = detail.data;

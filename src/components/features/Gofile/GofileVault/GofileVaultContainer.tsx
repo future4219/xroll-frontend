@@ -1,6 +1,3 @@
-// =============================================
-// File: GofileVaultPresenter.tsx (Presentational)
-// =============================================
 import React, { useEffect, useMemo, useState } from "react";
 import type {
   GofileCreateRes,
@@ -11,7 +8,7 @@ import type {
   Visibility,
 } from "@/components/features/Gofile/GofileVault/types";
 import axios from "axios";
-import { GofileVaultPresenter } from "./GofileVaultPresenter";
+import { GofileVaultPresenter } from "@/components/features/Gofile/GofileVault/GofileVaultPresenter";
 
 export function GofileVaultContainer() {
   const [rawItems, setRawItems] = useState<VaultItem[]>([]);
@@ -22,9 +19,10 @@ export function GofileVaultContainer() {
   const [shareFor, setShareFor] = useState<VaultItem | null>(null);
   const [queue, setQueue] = useState<UploadTask[]>([]);
 
+  const apiUrl = import.meta.env.VITE_API_URL;
   const UPLOAD_URL = "https://upload.gofile.io/uploadfile"; // Gofile直アップロード
-  const BACKEND_CREATE_URL = "http://localhost:8000/api/gofile/create";
-  const BACKEND_LIST_BASE = "http://localhost:8000/api/gofile";
+  const BACKEND_CREATE_URL = `${apiUrl}/gofile/create`;
+  const BACKEND_LIST_BASE = `${apiUrl}/gofile`;
   const USER_ID =
     typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
@@ -139,6 +137,27 @@ export function GofileVaultContainer() {
     [],
   );
 
+  const updateIsShared = React.useCallback(
+    async (item: VaultItem, isShared: boolean) => {
+      try {
+        const res = await axios.patch(
+          `${BACKEND_LIST_BASE}/update-is-shared`,
+          { is_shared: isShared, video_id: item.id },
+        );
+        if (res.status === 200) {
+          setRawItems((prev) =>
+            prev.map((i) => (i.id === item.id ? { ...i, isShared } : i)),
+          );
+        } else {
+          console.error("Failed to update share status:", res);
+        }
+      } catch (e) {
+        console.error("PATCH /api/gofile/:id/share failed:", e);
+      }
+    },
+    [],
+  );
+
   // URL パラメータでアップロードダイアログ起動
   useEffect(() => {
     try {
@@ -225,6 +244,7 @@ export function GofileVaultContainer() {
       video_url: t.gofile?.directLink || null,
       thumbnail_url: "",
       like_count: 0,
+      is_shared: false,
       gofile_tags: [],
       gofile_video_comments: [],
       user_id: USER_ID ?? null,
@@ -233,6 +253,7 @@ export function GofileVaultContainer() {
       updated_at: new Date().toISOString(),
       title: t.name,
       size: t.size,
+      isShared: false,
       createdAt: new Date().toISOString(),
       visibility: "private",
       duration: "",
@@ -271,6 +292,7 @@ export function GofileVaultContainer() {
         )
       }
       onToggleVisibility={onToggleVisibility}
+      updateIsShared={updateIsShared}
     />
   );
 }
@@ -286,6 +308,7 @@ export const adaptVideoToVaultItem = (v: GofileVideoRes): VaultItem => {
     createdAt: createdAtISO,
     visibility: "private",
     tags: v.gofile_tags?.map((t) => t.name) ?? [],
+    isShared: v.is_shared,
     share: v.gofile_direct_url
       ? { url: v.gofile_direct_url, enabled: false }
       : undefined,

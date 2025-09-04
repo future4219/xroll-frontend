@@ -1,24 +1,48 @@
 import { VisibilityBadge } from "@/components/features/Gofile/GofileVault/VisibilityBadge";
 import { VaultItem } from "@/components/features/Gofile/GofileVault/types";
+import { copy, timeAgo } from "@/components/features/Gofile/GofileVault/utils";
+import { set } from "date-fns";
 import { Copy, Eye, EyeOff, MoreVertical, Settings } from "lucide-react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { timeAgo, copy } from "./utils";
 
 export function VaultGrid({
   items,
   onShare,
   onToggleVisibility,
   buildWatchHref = (it) => `/gofile/watch?id=${it.id}`,
+  updateIsShared,
 }: {
   items: VaultItem[];
   onShare: (it: VaultItem) => void;
   onToggleVisibility: (id: string) => void;
   buildWatchHref?: (it: VaultItem) => string;
+  updateIsShared?: (item: VaultItem, isShared: boolean) => void;
 }) {
   const stop: React.MouseEventHandler = (e) => {
     e.stopPropagation();
     e.preventDefault();
   };
+
+  const [shareConfirmModalOpen, setShareConfirmModalOpen] =
+    React.useState(false);
+
+  const [selectedItem, setSelectedItem] = React.useState<VaultItem>({
+    id: "",
+    name: "",
+    gofile_id: "",
+    gofile_direct_url: null,
+    video_url: null,
+    thumbnail_url: null,
+    like_count: 0,
+    is_shared: false,
+    gofile_tags: [],
+    gofile_video_comments: [],
+    user_id: null,
+    user: { id: "", name: "", icon_url: "" },
+    created_at: "",
+    updated_at: "",
+  });
 
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -41,7 +65,7 @@ export function VaultGrid({
                 <div className="aspect-video w-full rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-900" />
               )}
               <div className="absolute top-2 left-2">
-                <VisibilityBadge v={it.visibility} />
+                <VisibilityBadge v={it.isShared ? "shared" : "private"} />
               </div>
               {it.duration && (
                 <span className="absolute bottom-2 right-2 rounded bg-black/70 px-1.5 py-0.5 text-xs">
@@ -86,7 +110,7 @@ export function VaultGrid({
             </div>
 
             <div className="mt-3 flex items-center gap-2">
-              {it.visibility === "shared" && it.share?.url && (
+              {it.isShared && it.share?.url && (
                 <button
                   onClick={(e) => {
                     stop(e);
@@ -101,10 +125,15 @@ export function VaultGrid({
                 onClick={(e) => {
                   stop(e);
                   onToggleVisibility(it.id);
+                  if (updateIsShared) {
+                    setShareConfirmModalOpen(true);
+                    setSelectedItem(it);
+                    // updateIsShared(it, !it.isShared);
+                  }
                 }}
                 className="inline-flex items-center gap-1 rounded-full border border-zinc-700 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800"
               >
-                {it.visibility === "shared" ? (
+                {it.isShared ? (
                   <>
                     <EyeOff className="h-3.5 w-3.5" /> 非公開にする
                   </>
@@ -118,6 +147,41 @@ export function VaultGrid({
           </Link>
         );
       })}
+      {shareConfirmModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl bg-zinc-900 p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-white">共有設定の確認</h3>
+            <p className="mt-3 text-sm text-zinc-300">
+              本当にこの動画を
+              <span className="font-medium text-white">
+                {selectedItem.isShared ? "非公開" : "共有"}
+              </span>
+              にしますか？
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShareConfirmModalOpen(false)}
+                className="rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log("Updating share status for:", selectedItem);
+                  updateIsShared?.(selectedItem, !selectedItem.isShared);
+                  setShareConfirmModalOpen(false);
+                }}
+                className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
+              >
+                確認
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

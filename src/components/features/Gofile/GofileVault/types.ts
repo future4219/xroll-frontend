@@ -44,6 +44,7 @@ export interface GofileVideoRes {
   video_url: string | null;
   thumbnail_url: string | null;
   like_count: number;
+  is_shared: boolean; // 共有されているかどうか
   gofile_tags: GofileTagRes[];
   gofile_video_comments: GofileVideoCommentRes[];
   user_id: string | null;
@@ -68,6 +69,7 @@ export interface VaultItem extends GofileVideoRes {
   thumbnail?: string; // => thumbnail_url をミラー
   mp4Url?: string; // => video_url or gofile_direct_url をミラー
   tags?: string[]; // => gofile_tags から name を抽出してもOK
+  isShared?: boolean; // 共有されているかどうか（share.url があるかどうかで判定）
   share?: {
     url?: string;
     password?: string | null;

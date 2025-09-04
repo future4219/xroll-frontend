@@ -11,7 +11,7 @@ export function VisibilityBadge({ v }: { v?: Visibility }) {
     return (
       <Badge tone="emerald">
         <Share2 className="h-3 w-3" />
-        共有中
+        公開中
       </Badge>
     );
   if (v === "processing")

@@ -46,6 +46,7 @@ export const GofileWatchPresenter: React.FC<GofileWatchPresenterProps> = ({
   comments = [],
   hasMoreComments = false,
 }) => {
+  const XROLL_API_ENDPOINT = import.meta.env.VITE_API_URL;
   return (
     <div className="min-h-screen bg-black text-white">
       <header className="fixed top-0 left-0 z-50 w-full bg-black text-white">
@@ -64,7 +65,7 @@ export const GofileWatchPresenter: React.FC<GofileWatchPresenterProps> = ({
           <video
             ref={videoRef}
             className="aspect-video w-full bg-black"
-            src={item?.mp4Url}
+            src={`${XROLL_API_ENDPOINT}/gofile/proxy?id=${item?.id}`}
             poster={item?.thumbnail}
             controls
             playsInline

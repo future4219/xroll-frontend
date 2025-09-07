@@ -9,6 +9,9 @@ import type {
 } from "@/components/features/Gofile/GofileVault/types";
 import axios from "axios";
 import { GofileVaultPresenter } from "@/components/features/Gofile/GofileVault/GofileVaultPresenter";
+// 変更点のみ（ファイル先頭部）
+import api from "@/lib/api";
+import { setAuthTokenCookie, getAuthTokenFromCookie } from "@/lib/auth";
 
 export function GofileVaultContainer() {
   const [rawItems, setRawItems] = useState<VaultItem[]>([]);
@@ -18,6 +21,7 @@ export function GofileVaultContainer() {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [shareFor, setShareFor] = useState<VaultItem | null>(null);
   const [queue, setQueue] = useState<UploadTask[]>([]);
+  const [booted, setBooted] = useState(false);
 
   const apiUrl = import.meta.env.VITE_API_URL;
   const UPLOAD_URL = "https://upload.gofile.io/uploadfile"; // Gofile直アップロード
@@ -26,15 +30,39 @@ export function GofileVaultContainer() {
   const USER_ID =
     typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
-  // 初回一覧取得
+  // 追加：最初に /auth/boot を叩く
   useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await api.get("/auth/boot"); // baseURLが /api を含む想定
+        // { AccessToken, TokenType, UserID } が返る前提
+        if (data?.accessToken || data?.AccessToken) {
+          const at = data.accessToken ?? data.AccessToken;
+          setAuthTokenCookie(at);
+        }
+        if (data?.userId || data?.UserID) {
+          const uid = data.userId ?? data.UserID;
+          localStorage.setItem("userId", uid);
+        }
+        setBooted(true);
+      } catch (e) {
+        console.error("GET /api/auth/boot failed:", e);
+        // 失敗してもゲスト運用を続けたいなら booted を true にするかは要件次第
+        setBooted(true);
+      }
+    })();
+  }, []);
+
+  // 既存：初回一覧取得（boot完了後に発火するように）
+  useEffect(() => {
+    if (!booted) return;
     if (!USER_ID) return;
     (async () => {
       try {
-        const { data } = await axios.get<GofileVideoListRes>(
+        const { data } = await api.get<GofileVideoListRes>(
           `${BACKEND_LIST_BASE}/${USER_ID}`,
         );
-        const videos = (data?.videos ?? []) as GofileVideoRes[]; // 型を確定
+        const videos = (data?.videos ?? []) as GofileVideoRes[];
         const list: VaultItem[] = videos.map(adaptVideoToVaultItem);
         setRawItems(list);
       } catch (e) {
@@ -42,7 +70,7 @@ export function GofileVaultContainer() {
         setRawItems([]);
       }
     })();
-  }, [USER_ID]);
+  }, [booted, USER_ID]);
 
   // アップロード 1件
   const uploadOne = React.useCallback(
@@ -89,7 +117,7 @@ export function GofileVaultContainer() {
 
         // バックエンド登録
         try {
-          await axios
+          await api
             .post<GofileCreateRes>(BACKEND_CREATE_URL, {
               name: file.name,
               gofile_id: go.id,
@@ -108,7 +136,7 @@ export function GofileVaultContainer() {
         // 再フェッチ
         try {
           if (!USER_ID) return;
-          const { data } = await axios.get<GofileVideoListRes>(
+          const { data } = await api.get<GofileVideoListRes>(
             `${BACKEND_LIST_BASE}/${USER_ID}`,
           );
           const videos = (data?.videos ?? []) as GofileVideoRes[];
@@ -140,10 +168,10 @@ export function GofileVaultContainer() {
   const updateIsShared = React.useCallback(
     async (item: VaultItem, isShared: boolean) => {
       try {
-        const res = await axios.patch(
-          `${BACKEND_LIST_BASE}/update-is-shared`,
-          { is_shared: isShared, video_id: item.id },
-        );
+        const res = await api.patch(`${BACKEND_LIST_BASE}/update-is-shared`, {
+          is_shared: isShared,
+          video_id: item.id,
+        });
         if (res.status === 200) {
           setRawItems((prev) =>
             prev.map((i) => (i.id === item.id ? { ...i, isShared } : i)),

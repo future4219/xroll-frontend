@@ -29,7 +29,7 @@ export function ShareDrawer({
   }, [item?.id]);
 
   if (!item) return null;
-  const url = item.share?.url || `https://xfile.to/s/${item.id}`;
+  const url = import.meta.env.VITE_FRONTEND_URL + "/gofile/watch?id=" + item.id;
 
   const save = () => {
     onUpdate({

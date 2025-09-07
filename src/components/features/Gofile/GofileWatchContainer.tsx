@@ -1,28 +1,16 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import axios from "axios";
-import { GofileWatchPresenter, type WatchItem } from "./GofileWatchPresenter";
+import api from "@/lib/api";
+import { useRef, useMemo, useEffect, useState } from "react";
 import { GofileVideoRes } from "./GofileVault/types";
-
-function toHumanDate(s?: string) {
-  if (!s) return "";
-  const t = s.replace(" ", "T");
-  const d = new Date(t);
-  if (isNaN(d.getTime())) return s;
-  const diff = (Date.now() - d.getTime()) / 1000;
-  if (diff < 60) return "たった今";
-  if (diff < 3600) return `${Math.floor(diff / 60)}分前`;
-  if (diff < 3600 * 24) return `${Math.floor(diff / 3600)}時間前`;
-  return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
-}
+import { WatchItem, GofileWatchPresenter } from "./GofileWatchPresenter";
 
 export function GofileWatchContainer() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [item, setItem] = useState<WatchItem | undefined>(undefined);
+  const [booted, setBooted] = useState(false); // ← Boot完了フラグ
 
   const apiUrl = import.meta.env.VITE_API_URL;
-  // resolve id from query string (?id=)
   const videoId = useMemo(() => {
     try {
       const sp = new URLSearchParams(window.location.search);
@@ -32,19 +20,34 @@ export function GofileWatchContainer() {
     }
   }, []);
 
-  // fetch detail only
+  // 1. Boot処理
   useEffect(() => {
+    (async () => {
+      try {
+        await api.get("/auth/boot"); // Cookieにxroll_at保存される
+        setBooted(true);
+      } catch (e) {
+        console.error("boot failed", e);
+        setError("認証に失敗しました");
+      }
+    })();
+  }, []);
+
+  // 2. Bootが終わったあとに動画をGET
+  useEffect(() => {
+    if (!booted) return; // Boot完了前は待つ
+    if (!videoId) {
+      setError("動画IDが指定されていません");
+      setLoading(false);
+      return;
+    }
+
     let aborted = false;
     (async () => {
-      if (!videoId) {
-        setError("動画IDが指定されていません");
-        setLoading(false);
-        return;
-      }
       setLoading(true);
       setError(null);
       try {
-        const detail = await axios.get<GofileVideoRes>(
+        const detail = await api.get<GofileVideoRes>(
           `${apiUrl}/gofile/video/${videoId}`,
         );
         if (aborted) return;
@@ -55,9 +58,9 @@ export function GofileWatchContainer() {
           mp4Url: v.video_url!,
           thumbnail: v.thumbnail_url || undefined,
           channel: v.user?.name,
-          uploadedAt: toHumanDate(v.created_at),
+          uploadedAt: v.created_at,
           description:
-            "ああああああああああああああああああああああああああああああああああああああああああああああああああああああ",
+            "あああああああああああああああああああああああああああああああああああああああああああああああああ",
           tags: (v.gofile_tags ?? []).map((t) => t.name),
           views: 80000,
           likeCount: 3424,
@@ -68,12 +71,13 @@ export function GofileWatchContainer() {
         if (!aborted) setLoading(false);
       }
     })();
+
     return () => {
       aborted = true;
     };
-  }, [videoId]);
+  }, [booted, videoId]);
 
-  // cleanup on unmount (keep console quiet)
+  // cleanup on unmount
   useEffect(() => {
     return () => {
       const el = videoRef.current;
@@ -86,7 +90,6 @@ export function GofileWatchContainer() {
     };
   }, []);
 
-  console.log(item);
   return (
     <GofileWatchPresenter
       item={item}

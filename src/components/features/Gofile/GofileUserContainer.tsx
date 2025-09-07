@@ -7,6 +7,7 @@ import {
   GofileVideoRes,
   VaultItem,
 } from "./GofileVault/types";
+import api from "@/lib/api";
 
 export function GofileUserContainer() {
   const [rawItems, setRawItems] = useState<VaultItem[]>([]);
@@ -17,7 +18,7 @@ export function GofileUserContainer() {
     if (!USER_ID) return;
     (async () => {
       try {
-        const { data } = await axios.get<GofileVideoListRes>(
+        const { data } = await api.get<GofileVideoListRes>(
           `${apiUrl}/gofile/${USER_ID}/shared`,
         );
         console.log("Fetched Gofile user items:", data);

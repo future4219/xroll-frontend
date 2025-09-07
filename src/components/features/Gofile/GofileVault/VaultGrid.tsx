@@ -1,9 +1,9 @@
 import { VisibilityBadge } from "@/components/features/Gofile/GofileVault/VisibilityBadge";
 import { VaultItem } from "@/components/features/Gofile/GofileVault/types";
 import { copy, timeAgo } from "@/components/features/Gofile/GofileVault/utils";
-import { set } from "date-fns";
-import { Copy, Eye, EyeOff, MoreVertical, Settings } from "lucide-react";
+import { Copy, Eye, EyeOff, Settings } from "lucide-react";
 import React from "react";
+import { IoTrashOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 
 export function VaultGrid({
@@ -12,12 +12,14 @@ export function VaultGrid({
   onToggleVisibility,
   buildWatchHref = (it) => `/gofile/watch?id=${it.id}`,
   updateIsShared,
+  deleteVideo,
 }: {
   items: VaultItem[];
   onShare: (it: VaultItem) => void;
   onToggleVisibility: (id: string) => void;
   buildWatchHref?: (it: VaultItem) => string;
   updateIsShared?: (item: VaultItem, isShared: boolean) => void;
+  deleteVideo: (videoId: string) => void;
 }) {
   const stop: React.MouseEventHandler = (e) => {
     e.stopPropagation();
@@ -44,6 +46,8 @@ export function VaultGrid({
     updated_at: "",
   });
 
+  const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] =
+    React.useState(false);
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((it) => {
@@ -99,11 +103,15 @@ export function VaultGrid({
                 </button>
                 <div className="relative">
                   <button
-                    onClick={stop}
+                    onClick={(e) => {
+                      stop(e);
+                      setSelectedItem(it);
+                      setDeleteConfirmModalOpen(true);
+                    }}
                     className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
                     title="その他"
                   >
-                    <MoreVertical className="h-5 w-5" />
+                    <IoTrashOutline className="h-5 w-5" />
                   </button>
                 </div>
               </div>
@@ -177,6 +185,37 @@ export function VaultGrid({
                 className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
               >
                 確認
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {deleteConfirmModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl bg-zinc-900 p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-white">動画削除の確認</h3>
+            <p className="mt-3 text-sm text-zinc-300">
+              本当にこの動画を削除しますか？
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteConfirmModalOpen(false)}
+                className="rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log("Deleting video:", selectedItem);
+                  deleteVideo?.(selectedItem.id);
+                  setDeleteConfirmModalOpen(false);
+                }}
+                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+              >
+                削除
               </button>
             </div>
           </div>

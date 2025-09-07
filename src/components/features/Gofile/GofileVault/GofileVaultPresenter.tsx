@@ -41,6 +41,7 @@ export interface GofileVaultPresenterProps {
   onPatchShare: (patch: Partial<VaultItem>) => void;
   onToggleVisibility: (id: string) => void;
   updateIsShared: (item: VaultItem, isShared: boolean) => void;
+  deleteVideo: (videoId: string) => void;
 }
 
 export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
@@ -63,6 +64,7 @@ export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
   onPatchShare,
   onToggleVisibility,
   updateIsShared,
+  deleteVideo,
 }) => {
   return (
     <div className="flex min-h-screen flex-col bg-black text-white">
@@ -125,6 +127,7 @@ export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
             onShare={onOpenShare}
             onToggleVisibility={onToggleVisibility}
             updateIsShared={updateIsShared}
+            deleteVideo={deleteVideo}
           />
         ) : (
           <VaultList

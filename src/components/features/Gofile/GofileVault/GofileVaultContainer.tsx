@@ -186,6 +186,19 @@ export function GofileVaultContainer() {
     [],
   );
 
+  const deleteVideo = React.useCallback(async (videoId: string) => {
+    try {
+      const res = await api.delete(`${BACKEND_LIST_BASE}/delete/${videoId}`);
+      if (res.status === 200) {
+        setRawItems((prev) => prev.filter((i) => i.id !== videoId));
+      } else {
+        console.error("Failed to delete video:", res);
+      }
+    } catch (e) {
+      console.error("DELETE /api/gofile/:id failed:", e);
+    }
+  }, []);
+
   // URL パラメータでアップロードダイアログ起動
   useEffect(() => {
     try {
@@ -321,6 +334,7 @@ export function GofileVaultContainer() {
       }
       onToggleVisibility={onToggleVisibility}
       updateIsShared={updateIsShared}
+      deleteVideo={deleteVideo}
     />
   );
 }

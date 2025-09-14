@@ -1,6 +1,6 @@
 import { X, LinkIcon, Copy, Hash, Clock, Lock } from "lucide-react";
 import { useState, useEffect } from "react";
-import { VaultItem } from "@/components/features/Gofile/GofileVault/types";
+import { GofileVideo } from "@/components/features/Gofile/GofileVault/types";
 import { copy } from "./utils";
 
 export function ShareDrawer({
@@ -8,42 +8,42 @@ export function ShareDrawer({
   onClose,
   onUpdate,
 }: {
-  item: VaultItem | null;
+  item: GofileVideo | null;
   onClose: () => void;
-  onUpdate: (patch: Partial<VaultItem>) => void;
+  onUpdate: (patch: Partial<GofileVideo>) => void;
 }) {
-  const [pwd, setPwd] = useState(item?.share?.password || "");
-  const [enabled, setEnabled] = useState(!!item?.share?.enabled);
-  const [maxPlays, setMaxPlays] = useState<number | "" | null>(
-    item?.share?.maxPlays ?? "",
-  );
-  const [expire, setExpire] = useState<string | null>(
-    item?.share?.expireAt || null,
-  );
+  // const [pwd, setPwd] = useState(item?.share?.password || "");
+  // const [enabled, setEnabled] = useState(!!item?.share?.enabled);
+  // const [maxPlays, setMaxPlays] = useState<number | "" | null>(
+  //   item?.share?.maxPlays ?? "",
+  // );
+  // const [expire, setExpire] = useState<string | null>(
+  //   item?.share?.expireAt || null,
+  // );
 
-  useEffect(() => {
-    setPwd(item?.share?.password || "");
-    setEnabled(!!item?.share?.enabled);
-    setMaxPlays(item?.share?.maxPlays ?? "");
-    setExpire(item?.share?.expireAt || null);
-  }, [item?.id]);
+  // useEffect(() => {
+  //   setPwd(item?.share?.password || "");
+  //   setEnabled(!!item?.share?.enabled);
+  //   setMaxPlays(item?.share?.maxPlays ?? "");
+  //   setExpire(item?.share?.expireAt || null);
+  // }, [item?.id]);
 
   if (!item) return null;
-  const url = import.meta.env.VITE_FRONTEND_URL + "/gofile/watch?id=" + item.id;
+  const url = import.meta.env.VITE_FRONTEND_URL + "/gofile/watch?id=" + item.Id;
 
-  const save = () => {
-    onUpdate({
-      visibility: enabled ? "shared" : "private",
-      share: {
-        url,
-        password: pwd || null,
-        maxPlays: maxPlays === "" ? null : Number(maxPlays),
-        expireAt: expire,
-        enabled,
-      },
-    });
-    onClose();
-  };
+  // const save = () => {
+  //   onUpdate({
+  //     visibility: enabled ? "shared" : "private",
+  //     share: {
+  //       url,
+  //       password: pwd || null,
+  //       maxPlays: maxPlays === "" ? null : Number(maxPlays),
+  //       expireAt: expire,
+  //       enabled,
+  //     },
+  //   });
+  //   onClose();
+  // };
 
   return (
     <div className="fixed inset-0 z-[90] flex justify-end bg-black/50">
@@ -85,15 +85,11 @@ export function ShareDrawer({
               </div>
             </div>
             <button
-              onClick={() => setEnabled((v) => !v)}
-              className={`relative h-6 w-11 rounded-full ${
-                enabled ? "bg-emerald-500" : "bg-zinc-700"
-              }`}
+              onClick={() => {}}
+              className={"relative h-6 w-11 rounded-full bg-zinc-700 "}
             >
               <span
-                className={`absolute top-0.5 ${
-                  enabled ? "left-6" : "left-0.5"
-                } inline-block h-5 w-5 rounded-full bg-white transition`}
+                className={`"left-6" absolute  top-0.5 inline-block h-5 w-5 rounded-full bg-white transition`}
               />
             </button>
           </div>
@@ -106,8 +102,8 @@ export function ShareDrawer({
               <div className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900/50 px-3 py-2">
                 <Lock className="h-4 w-4 text-zinc-400" />
                 <input
-                  value={pwd}
-                  onChange={(e) => setPwd(e.target.value)}
+                  value={""}
+                  onChange={() => {}}
                   placeholder="設定しない場合は空欄"
                   className="w-full bg-transparent text-sm outline-none"
                 />
@@ -119,7 +115,7 @@ export function ShareDrawer({
               </label>
               <div className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900/50 px-3 py-2">
                 <Hash className="h-4 w-4 text-zinc-400" />
-                <input
+                {/* <input
                   value={maxPlays === null ? "" : String(maxPlays)}
                   onChange={(e) => {
                     const v = e.target.value;
@@ -128,7 +124,7 @@ export function ShareDrawer({
                   }}
                   placeholder="例: 5"
                   className="w-full bg-transparent text-sm outline-none"
-                />
+                /> */}
               </div>
             </div>
             <div className="space-y-2 sm:col-span-2">
@@ -137,12 +133,12 @@ export function ShareDrawer({
               </label>
               <div className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900/50 px-3 py-2">
                 <Clock className="h-4 w-4 text-zinc-400" />
-                <input
+                {/* <input
                   value={expire ?? ""}
                   onChange={(e) => setExpire(e.target.value || null)}
                   placeholder="2025-12-31T23:59:59Z"
                   className="w-full bg-transparent text-sm outline-none"
-                />
+                /> */}
               </div>
             </div>
           </div>
@@ -155,7 +151,7 @@ export function ShareDrawer({
               キャンセル
             </button>
             <button
-              onClick={save}
+              onClick={() => {}}
               className="rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-black"
             >
               保存

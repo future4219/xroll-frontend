@@ -1,5 +1,3 @@
-// types.ts
-
 export type Visibility = "private" | "shared" | "processing" | "failed";
 
 // ==== Backend responses ====
@@ -22,6 +20,8 @@ export interface UserRes {
   id: string;
   name?: string;
   icon_url?: string;
+  user_type?: string;
+  bio?: string;
   [k: string]: any;
 }
 
@@ -43,12 +43,15 @@ export interface GofileVideoRes {
   gofile_direct_url: string | null;
   video_url: string | null;
   thumbnail_url: string | null;
+  description: string | null;
+  play_count: number; // 再生回数
   like_count: number;
   is_shared: boolean; // 共有されているかどうか
   gofile_tags: GofileTagRes[];
   gofile_video_comments: GofileVideoCommentRes[];
   user_id: string | null;
   user: UserRes;
+  has_like: boolean; // 自分がいいねしているかどうか
   created_at: string; // "2006-01-02 15:04:05"
   updated_at: string; // "2006-01-02 15:04:05"
 }
@@ -58,25 +61,96 @@ export interface GofileVideoListRes {
   count: number;
 }
 
-// ==== UIで使う型（後方互換のため既存フィールドは optional で残す）====
-export interface VaultItem extends GofileVideoRes {
-  /** 既存UI互換: 以下は任意項目（バックエンドに無いので適宜アダプト） */
-  title?: string; // => name をミラー
-  size?: number; // バックエンドに無い
-  createdAt?: string; // => created_at から ISO に変換したもの
-  visibility?: Visibility; // 既定は "private"
-  duration?: string; // バックエンドに無い（将来のため残す）
-  thumbnail?: string; // => thumbnail_url をミラー
-  mp4Url?: string; // => video_url or gofile_direct_url をミラー
-  tags?: string[]; // => gofile_tags から name を抽出してもOK
-  isShared?: boolean; // 共有されているかどうか（share.url があるかどうかで判定）
-  share?: {
-    url?: string;
-    password?: string | null;
-    expireAt?: string | null;
-    maxPlays?: number | null;
-    plays?: number;
-    enabled?: boolean;
+export type GofileVideo = {
+  Id: string;
+  Name: string;
+  GofileId: string;
+  GofileDirectUrl: string | null;
+  VideoUrl: string | null;
+  ThumbnailUrl: string | null;
+  Description: string | null;
+  PlayCount: number; // 再生回数
+  LikeCount: number;
+  IsShared: boolean; // 共有されているかどうか
+  GofileTags: GofileTag[];
+  GofileVideoComments: GofileVideoComment[];
+  UserId: string | null;
+  User: User;
+  HasLike: boolean; // 自分がいいねしているかどうか
+  CreatedAt: string; // "2006-01-02 15:04:05"
+  UpdatedAt: string; // "2006-01-02 15:04:05"
+};
+
+export function GofileVideoResToGofileVideo(v: GofileVideoRes): GofileVideo {
+  return {
+    Id: v.id,
+    Name: v.name,
+    GofileId: v.gofile_id,
+    GofileDirectUrl: v.gofile_direct_url,
+    VideoUrl: v.video_url,
+    ThumbnailUrl: v.thumbnail_url,
+    Description: v.description,
+    PlayCount: v.play_count,
+    LikeCount: v.like_count,
+    IsShared: v.is_shared,
+    GofileTags: v.gofile_tags.map((t) => ({
+      ID: t.id,
+      Name: t.name,
+      // バックエンドの定義に応じて増えうるので任意
+      ...t,
+    })),
+    GofileVideoComments: v.gofile_video_comments.map((c) => ({
+      ID: c.id,
+      Comment: c.comment,
+      LikeCount: c.like_count,
+      CreatedAt: c.created_at,
+      UpdatedAt: c.updated_at,
+    })),
+    UserId: v.user_id,
+    User: {
+      Id: v.user.id,
+      Name: v.user.name,
+      IconUrl: v.user.icon_url,
+      UserType: v.user.user_type,
+      Bio: v.user.bio,
+      ...v.user,
+    },
+    HasLike: v.has_like,
+    CreatedAt: v.created_at,
+    UpdatedAt: v.updated_at,
+  };
+}
+
+export type GofileTag = {
+  ID: string;
+  Name: string;
+};
+
+export type GofileVideoComment = {
+  ID: string;
+  Comment: string;
+  LikeCount: number;
+  CreatedAt: string; // "2006-01-02 15:04:05"
+  UpdatedAt: string;
+};
+
+export type User = {
+  Id: string;
+  Name?: string;
+  IconUrl?: string;
+  UserType?: string;
+  Bio?: string;
+  [k: string]: any;
+};
+
+export function adaptUserResToUser(u: UserRes): User {
+  return {
+    Id: u.id,
+    Name: u.name,
+    IconUrl: u.icon_url,
+    UserType: u.user_type,
+    Bio: u.bio,
+    ...u,
   };
 }
 
@@ -97,3 +171,10 @@ export interface UploadTask {
   };
   error?: string;
 }
+
+export type GofileUpdateReq = {
+  name: string;
+  description: string;
+  is_shared: boolean;
+  tag_ids: string[]; // タグ名の配列
+};

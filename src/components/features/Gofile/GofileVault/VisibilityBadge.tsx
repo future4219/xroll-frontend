@@ -1,7 +1,7 @@
 import { Share2, Clock, AlertTriangle, Lock } from "lucide-react";
 import {
   UploadTask,
-  VaultItem,
+  GofileVideo,
   Visibility,
 } from "@/components/features/Gofile/GofileVault/types";
 import { Badge } from "@/components/ui/Badge";

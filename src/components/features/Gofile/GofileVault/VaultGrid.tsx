@@ -1,49 +1,59 @@
 import { VisibilityBadge } from "@/components/features/Gofile/GofileVault/VisibilityBadge";
-import { VaultItem } from "@/components/features/Gofile/GofileVault/types";
+import { GofileVideo } from "@/components/features/Gofile/GofileVault/types";
 import { copy, timeAgo } from "@/components/features/Gofile/GofileVault/utils";
-import { Copy, Eye, EyeOff, Settings } from "lucide-react";
+import { BadgeCheck, Copy, Eye, EyeOff, Settings } from "lucide-react";
 import React from "react";
 import { IoTrashOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
+import ProfileIcon from "@/components/ui/ProfileIcon.jpg";
 
 export function VaultGrid({
   items,
   onShare,
   onToggleVisibility,
-  buildWatchHref = (it) => `/gofile/watch?id=${it.id}`,
+  buildWatchHref = (it) => `/gofile/watch?id=${it.Id}`,
   updateIsShared,
   deleteVideo,
 }: {
-  items: VaultItem[];
-  onShare: (it: VaultItem) => void;
-  onToggleVisibility: (id: string) => void;
-  buildWatchHref?: (it: VaultItem) => string;
-  updateIsShared?: (item: VaultItem, isShared: boolean) => void;
-  deleteVideo: (videoId: string) => void;
+  items: GofileVideo[];
+  onShare?: (it: GofileVideo) => void;
+  onToggleVisibility?: (id: string) => void;
+  buildWatchHref?: (it: GofileVideo) => string;
+  updateIsShared?: (item: GofileVideo, isShared: boolean) => void;
+  deleteVideo?: (videoId: string) => void;
 }) {
   const stop: React.MouseEventHandler = (e) => {
     e.stopPropagation();
     e.preventDefault();
   };
-
+  console.log("VaultGrid items:", items);
   const [shareConfirmModalOpen, setShareConfirmModalOpen] =
     React.useState(false);
 
-  const [selectedItem, setSelectedItem] = React.useState<VaultItem>({
-    id: "",
-    name: "",
-    gofile_id: "",
-    gofile_direct_url: null,
-    video_url: null,
-    thumbnail_url: null,
-    like_count: 0,
-    is_shared: false,
-    gofile_tags: [],
-    gofile_video_comments: [],
-    user_id: null,
-    user: { id: "", name: "", icon_url: "" },
-    created_at: "",
-    updated_at: "",
+  const [selectedItem, setSelectedItem] = React.useState<GofileVideo>({
+    Id: "",
+    Name: "",
+    GofileId: "",
+    GofileDirectUrl: "",
+    VideoUrl: "",
+    ThumbnailUrl: "",
+    Description: null,
+    PlayCount: 0,
+    LikeCount: 0,
+    IsShared: false,
+    GofileTags: [],
+    GofileVideoComments: [],
+    UserId: null,
+    User: {
+      Id: "",
+      Name: "",
+      Email: "",
+      CreatedAt: "",
+      UpdatedAt: "",
+    },
+    HasLike: false,
+    CreatedAt: "",
+    UpdatedAt: "",
   });
 
   const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] =
@@ -54,103 +64,127 @@ export function VaultGrid({
         const href = buildWatchHref(it);
         return (
           <Link
-            key={it.id}
+            key={it.Id}
             to={href}
             className="group block rounded-2xl border border-white/10 bg-white/[0.03] p-3 transition hover:border-white/20 hover:bg-white/[0.05] focus:outline-none focus:ring-2 focus:ring-amber-500/60"
           >
             <div className="relative">
-              {it.thumbnail ? (
+              {it.ThumbnailUrl ? (
                 <img
-                  src={it.thumbnail}
-                  alt={it.title}
+                  src={it.ThumbnailUrl}
+                  alt={it.Name}
                   className="aspect-video w-full rounded-xl object-cover"
                 />
               ) : (
                 <div className="aspect-video w-full rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-900" />
               )}
               <div className="absolute top-2 left-2">
-                <VisibilityBadge v={it.isShared ? "shared" : "private"} />
+                <VisibilityBadge v={it.IsShared ? "shared" : "private"} />
               </div>
-              {it.duration && (
+              {/* {it.duration && (
                 <span className="absolute bottom-2 right-2 rounded bg-black/70 px-1.5 py-0.5 text-xs">
-                  {it.duration}
+                  {3}
                 </span>
-              )}
+              )} */}
             </div>
 
             <div className="mt-3 flex items-start gap-3">
-              <div className="h-9 w-9 shrink-0 rounded-full bg-zinc-700" />
+              <Link to={`/gofile/user?id=${it?.UserId}`}>
+                <img
+                  alt="avatar"
+                  className="h-full h-10 w-full w-10 rounded-full bg-white/5 object-cover"
+                  src={ProfileIcon} // ここは実際の画像パスに置き換えてください
+                />
+              </Link>
               <div className="min-w-0 flex-1">
                 <div className="line-clamp-2 text-[15px] font-medium">
-                  {it.title}
+                  {it.Name}
                 </div>
                 <div className="mt-1 flex flex-wrap gap-2 text-xs text-zinc-400">
+                  <span>{it.User.Name}</span>
+                  {(it.User.UserType == "SystemAdmin" ||
+                    it.User.UserType == "OfficialUser") && (
+                    <BadgeCheck
+                      className="text-blue-400"
+                      aria-label="verified"
+                      size={16}
+                    />
+                  )}
                   <span className="opacity-60">•</span>
-                  <span>{timeAgo(it.createdAt!)}</span>
+                  <span>{it.LikeCount} いいね</span>
+                  <span className="opacity-60">•</span>
+                  <span>{timeAgo(it.CreatedAt)}</span>
                 </div>
               </div>
-
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={(e) => {
-                    stop(e);
-                    onShare(it);
-                  }}
-                  className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
-                  title="共有設定"
-                >
-                  <Settings className="h-5 w-5" />
-                </button>
-                <div className="relative">
+              {onShare && (
+                <div className="flex items-center gap-1">
                   <button
                     onClick={(e) => {
                       stop(e);
-                      setSelectedItem(it);
-                      setDeleteConfirmModalOpen(true);
+                      onShare(it);
                     }}
                     className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
-                    title="その他"
+                    title="共有設定"
                   >
-                    <IoTrashOutline className="h-5 w-5" />
+                    <Settings className="h-5 w-5" />
                   </button>
+                  <div className="relative">
+                    <button
+                      onClick={(e) => {
+                        stop(e);
+                        setSelectedItem(it);
+                        setDeleteConfirmModalOpen(true);
+                      }}
+                      className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
+                      title="削除"
+                    >
+                      <IoTrashOutline className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="mt-3 flex items-center gap-2">
-              {it.isShared && it.share?.url && (
+              {it.IsShared && (
                 <button
                   onClick={(e) => {
                     stop(e);
-                    copy(it.gofile_direct_url!);
+                    copy(
+                      import.meta.env.VITE_FRONTEND_URL +
+                        "/gofile/watch?id=" +
+                        it.Id,
+                    );
                   }}
                   className="inline-flex items-center gap-1 rounded-full border border-zinc-700 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800"
                 >
                   <Copy className="h-3.5 w-3.5" /> コピー
                 </button>
               )}
-              <button
-                onClick={(e) => {
-                  stop(e);
-                  onToggleVisibility(it.id);
-                  if (updateIsShared) {
-                    setShareConfirmModalOpen(true);
-                    setSelectedItem(it);
-                    // updateIsShared(it, !it.isShared);
-                  }
-                }}
-                className="inline-flex items-center gap-1 rounded-full border border-zinc-700 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800"
-              >
-                {it.isShared ? (
-                  <>
-                    <EyeOff className="h-3.5 w-3.5" /> 非公開にする
-                  </>
-                ) : (
-                  <>
-                    <Eye className="h-3.5 w-3.5" /> 共有する
-                  </>
-                )}
-              </button>
+              {onToggleVisibility && (
+                <button
+                  onClick={(e) => {
+                    stop(e);
+                    onToggleVisibility(it.Id);
+                    if (updateIsShared) {
+                      setShareConfirmModalOpen(true);
+                      setSelectedItem(it);
+                      // updateIsShared(it, !it.isShared);
+                    }
+                  }}
+                  className="inline-flex items-center gap-1 rounded-full border border-zinc-700 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800"
+                >
+                  {it.IsShared ? (
+                    <>
+                      <EyeOff className="h-3.5 w-3.5" /> 非公開にする
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="h-3.5 w-3.5" /> 共有する
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </Link>
         );
@@ -162,7 +196,7 @@ export function VaultGrid({
             <p className="mt-3 text-sm text-zinc-300">
               本当にこの動画を
               <span className="font-medium text-white">
-                {selectedItem.isShared ? "非公開" : "共有"}
+                {selectedItem.IsShared ? "非公開" : "共有"}
               </span>
               にしますか？
             </p>
@@ -179,7 +213,7 @@ export function VaultGrid({
                   e.preventDefault();
                   e.stopPropagation();
                   console.log("Updating share status for:", selectedItem);
-                  updateIsShared?.(selectedItem, !selectedItem.isShared);
+                  updateIsShared?.(selectedItem, !selectedItem.IsShared);
                   setShareConfirmModalOpen(false);
                 }}
                 className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
@@ -210,7 +244,7 @@ export function VaultGrid({
                   e.preventDefault();
                   e.stopPropagation();
                   console.log("Deleting video:", selectedItem);
-                  deleteVideo?.(selectedItem.id);
+                  deleteVideo?.(selectedItem.Id);
                   setDeleteConfirmModalOpen(false);
                 }}
                 className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"

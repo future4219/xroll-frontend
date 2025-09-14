@@ -12,6 +12,7 @@ export const appUrl = {
   gofileUpload: "/gofile/upload",
   gofileWatch: "/gofile/watch",
   gofileUser: "/gofile/user",
+  gofileLikeVideo: "/gofile/like-video",
 
   // 動的にクエリ付きURLを返す関数
   mainVideoListWithView: (view: "reels" | "thumbs") => `/?view=${view}`,

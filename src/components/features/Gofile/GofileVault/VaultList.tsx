@@ -1,7 +1,7 @@
 import { Copy, Settings, EyeOff, Eye } from "lucide-react";
 import {
   UploadTask,
-  VaultItem,
+  GofileVideo,
   Visibility,
 } from "@/components/features/Gofile/GofileVault/types";
 import { VisibilityBadge } from "./VisibilityBadge";
@@ -16,8 +16,8 @@ export function VaultList({
   onShare,
   onToggleVisibility,
 }: {
-  items: VaultItem[];
-  onShare: (it: VaultItem) => void;
+  items: GofileVideo[];
+  onShare: (it: GofileVideo) => void;
   onToggleVisibility: (id: string) => void;
 }) {
   return (
@@ -34,34 +34,35 @@ export function VaultList({
         </thead>
         <tbody>
           {items.map((it) => (
-            <tr key={it.id} className="border-t border-white/5">
+            <tr key={it.Id} className="border-t border-white/5">
               <td className="px-3 py-2">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-16 rounded bg-zinc-800" />
                   <div className="min-w-0">
                     <div className="truncate font-medium text-zinc-100">
-                      {it.title}
+                      {it.Name}
                     </div>
-                    <div className="text-xs text-zinc-400">
+                    {/* <div className="text-xs text-zinc-400">
                       {it.duration || "--:--"}
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </td>
-              <td className="px-3 py-2">
+              {/* <td className="px-3 py-2">
                 <VisibilityBadge v={it.visibility} />
-              </td>
+
+              </td> */}
               {/* <td className="px-3 py-2 text-zinc-300">
                 {formatBytes(it.size)}
               </td> */}
               <td className="px-3 py-2 text-zinc-400">
-                {timeAgo(it.createdAt!)}
+                {timeAgo(it.CreatedAt!)}
               </td>
               <td className="px-3 py-2 text-right">
                 <div className="inline-flex items-center gap-2">
-                  {it.visibility === "shared" && it.share?.url && (
+                  {it.IsShared && (
                     <button
-                      onClick={() => copy(it.share?.url)}
+                      onClick={() => copy(it.GofileDirectUrl!)}
                       className="rounded border border-zinc-700 px-2 py-1 hover:bg-zinc-800"
                     >
                       <Copy className="h-4 w-4" />
@@ -74,10 +75,10 @@ export function VaultList({
                     <Settings className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => onToggleVisibility(it.id)}
+                    onClick={() => onToggleVisibility(it.Id)}
                     className="rounded border border-zinc-700 px-2 py-1 hover:bg-zinc-800"
                   >
-                    {it.visibility === "shared" ? (
+                    {it.IsShared ? (
                       <EyeOff className="h-4 w-4" />
                     ) : (
                       <Eye className="h-4 w-4" />

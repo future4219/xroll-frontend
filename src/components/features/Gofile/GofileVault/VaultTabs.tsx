@@ -1,7 +1,7 @@
 import { LayoutGrid, List } from "lucide-react";
 import {
   UploadTask,
-  VaultItem,
+  GofileVideo,
   Visibility,
 } from "@/components/features/Gofile/GofileVault/types";
 

@@ -18,21 +18,14 @@ export function GofilePresenter() {
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-black text-white">
       <BackgroundDeco />
 
-      <header className={"fixed top-0 left-0 z-50 w-full bg-black  text-white"}>
-        <div className="relative mx-auto flex h-16 max-w-5xl items-center justify-between ">
-          {/* 左：ロゴとメニュー */}
-          <div className="flex items-center ">
+      <header className="fixed top-0 left-0 z-50 w-full bg-black text-white">
+        <div className="relative mx-auto flex h-16 max-w-7xl items-center gap-3 px-4">
+          <div className="flex items-center gap-2">
             <SideBarMenuXfile />
-            <Link to="/">
-              <div></div>
-              Xfile
-            </Link>
+            <div className="text-[15px] font-semibold tracking-tight">
+              Gofile Controller
+            </div>
           </div>
-
-          {/* 中央：リール / サムネイル切り替え */}
-
-          {/* 右側の空き領域 */}
-          <div className="w-8" />
         </div>
       </header>
 
@@ -55,7 +48,7 @@ export function GofilePresenter() {
                 <br className="hidden sm:block" />
                 あなたのルール「
                 <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 bg-clip-text text-transparent">
-                  Xfile
+                  Gofile Controller
                 </span>
                 」
               </span>
@@ -69,7 +62,7 @@ export function GofilePresenter() {
             {/* CTAs */}
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
-                href={appUrl.gofileUpload}
+                href={appUrl.gofileVault}
                 className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-7 py-3.5 text-base font-semibold text-black shadow-[0_10px_30px_-10px_rgba(245,158,11,0.6)] transition hover:from-amber-400 hover:to-orange-400 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:ring-offset-2 focus:ring-offset-black"
                 aria-label="My Vault（自分の保存庫）へ"
               >
@@ -108,28 +101,6 @@ export function GofilePresenter() {
         </section>
 
         {/* ===== Trust strip ===== */}
-        <section className="mt-16 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-xs uppercase tracking-wider text-zinc-400">
-              Trusted by creators & studios
-            </p>
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 opacity-80">
-              <span className="text-zinc-400">Creator A</span>
-              <span className="h-3 w-px bg-white/10" />
-              <span className="text-zinc-400">Studio B</span>
-              <span className="h-3 w-px bg-white/10" />
-              <span className="text-zinc-400">Team C</span>
-              <span className="h-3 w-px bg-white/10" />
-              <span className="text-zinc-400">Producer D</span>
-            </div>
-          </div>
-        </section>
-
-        {/* note */}
-        <p className="mx-auto mt-6 max-w-2xl text-center text-xs text-zinc-400">
-          ※
-          索引（検索掲載）は段階的に開放されます。まずは非公開で安全にお試しください。
-        </p>
 
         {/* ===== Trust / Specs ===== */}
         <TrustSpecs />
@@ -313,7 +284,7 @@ function TrustSpecs() {
             <h3 className="font-semibold text-zinc-200">変更履歴 / 連絡先</h3>
             <p className="mt-2 text-sm text-zinc-300">
               セキュリティ関連の重要変更は公開ノートで告知。緊急連絡は
-              security@… へ。
+              xroll.net@gmail.com へ。
             </p>
             <div className="mt-3 space-x-4 text-sm">
               <a
@@ -326,7 +297,7 @@ function TrustSpecs() {
                 href="mailto:security@example.com"
                 className="underline underline-offset-4 hover:text-white"
               >
-                security@example.com
+                xroll.net@gmail.com
               </a>
             </div>
           </Card>

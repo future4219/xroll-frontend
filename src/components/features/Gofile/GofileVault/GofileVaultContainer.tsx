@@ -4,24 +4,24 @@ import type {
   GofileVideoListRes,
   GofileVideoRes,
   UploadTask,
-  VaultItem,
+  GofileVideo,
   Visibility,
+  GofileUpdateReq,
 } from "@/components/features/Gofile/GofileVault/types";
 import axios from "axios";
 import { GofileVaultPresenter } from "@/components/features/Gofile/GofileVault/GofileVaultPresenter";
 // 変更点のみ（ファイル先頭部）
 import api from "@/lib/api";
-import { setAuthTokenCookie, getAuthTokenFromCookie } from "@/lib/auth";
+import { setAuthTokenCookie } from "@/lib/auth";
 
 export function GofileVaultContainer() {
-  const [rawItems, setRawItems] = useState<VaultItem[]>([]);
+  const [rawItems, setRawItems] = useState<GofileVideo[]>([]);
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState<Visibility | "recent">("recent");
   const [view, setView] = useState<"grid" | "list">("grid");
   const [uploadOpen, setUploadOpen] = useState(false);
-  const [shareFor, setShareFor] = useState<VaultItem | null>(null);
+  const [shareFor, setShareFor] = useState<GofileVideo | null>(null);
   const [queue, setQueue] = useState<UploadTask[]>([]);
-  const [booted, setBooted] = useState(false);
 
   const apiUrl = import.meta.env.VITE_API_URL;
   const UPLOAD_URL = "https://upload.gofile.io/uploadfile"; // Gofile直アップロード
@@ -30,32 +30,8 @@ export function GofileVaultContainer() {
   const USER_ID =
     typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
-  // 追加：最初に /auth/boot を叩く
-  useEffect(() => {
-    (async () => {
-      try {
-        const { data } = await api.get("/auth/boot"); // baseURLが /api を含む想定
-        // { AccessToken, TokenType, UserID } が返る前提
-        if (data?.accessToken || data?.AccessToken) {
-          const at = data.accessToken ?? data.AccessToken;
-          setAuthTokenCookie(at);
-        }
-        if (data?.userId || data?.UserID) {
-          const uid = data.userId ?? data.UserID;
-          localStorage.setItem("userId", uid);
-        }
-        setBooted(true);
-      } catch (e) {
-        console.error("GET /api/auth/boot failed:", e);
-        // 失敗してもゲスト運用を続けたいなら booted を true にするかは要件次第
-        setBooted(true);
-      }
-    })();
-  }, []);
-
   // 既存：初回一覧取得（boot完了後に発火するように）
   useEffect(() => {
-    if (!booted) return;
     if (!USER_ID) return;
     (async () => {
       try {
@@ -63,14 +39,14 @@ export function GofileVaultContainer() {
           `${BACKEND_LIST_BASE}/${USER_ID}`,
         );
         const videos = (data?.videos ?? []) as GofileVideoRes[];
-        const list: VaultItem[] = videos.map(adaptVideoToVaultItem);
+        const list: GofileVideo[] = videos.map(adaptVideoToGofileVideo);
         setRawItems(list);
       } catch (e) {
         console.error("GET /api/gofile/:userId failed:", e);
         setRawItems([]);
       }
     })();
-  }, [booted, USER_ID]);
+  }, [USER_ID]);
 
   // アップロード 1件
   const uploadOne = React.useCallback(
@@ -140,7 +116,7 @@ export function GofileVaultContainer() {
             `${BACKEND_LIST_BASE}/${USER_ID}`,
           );
           const videos = (data?.videos ?? []) as GofileVideoRes[];
-          const list: VaultItem[] = videos.map(adaptVideoToVaultItem);
+          const list: GofileVideo[] = videos.map(adaptVideoToGofileVideo);
           setRawItems(list);
         } catch (e) {
           console.error("re-fetch list failed:", e);
@@ -166,16 +142,19 @@ export function GofileVaultContainer() {
   );
 
   const updateIsShared = React.useCallback(
-    async (item: VaultItem, isShared: boolean) => {
+    async (item: GofileVideo, isShared: boolean) => {
       try {
         const res = await api.patch(`${BACKEND_LIST_BASE}/update-is-shared`, {
           is_shared: isShared,
-          video_id: item.id,
+          video_id: item.Id,
         });
         if (res.status === 200) {
           setRawItems((prev) =>
-            prev.map((i) => (i.id === item.id ? { ...i, isShared } : i)),
+            prev.map((i) =>
+              i.Id === item.Id ? { ...i, IsShared: isShared } : i,
+            ),
           );
+          console.log("Updated share status:", isShared);
         } else {
           console.error("Failed to update share status:", res);
         }
@@ -190,7 +169,7 @@ export function GofileVaultContainer() {
     try {
       const res = await api.delete(`${BACKEND_LIST_BASE}/delete/${videoId}`);
       if (res.status === 200) {
-        setRawItems((prev) => prev.filter((i) => i.id !== videoId));
+        setRawItems((prev) => prev.filter((i) => i.Id !== videoId));
       } else {
         console.error("Failed to delete video:", res);
       }
@@ -210,13 +189,16 @@ export function GofileVaultContainer() {
   // フィルタリング（Presenter に渡す最終 items）
   const items = useMemo(() => {
     let all = [...rawItems].sort(
-      (a, b) => +new Date(b.createdAt!) - +new Date(a.createdAt!),
+      (a, b) => +new Date(b.CreatedAt!) - +new Date(a.CreatedAt!),
     );
-    if (tab !== "recent") all = all.filter((i) => i.visibility === tab);
+
     const q = query.trim().toLowerCase();
     if (!q) return all;
     return all.filter((i) =>
-      [i.title, i.tags?.join(" ") || ""].join(" ").toLowerCase().includes(q),
+      [i.Name, i.GofileTags?.join(" ") || ""]
+        .join(" ")
+        .toLowerCase()
+        .includes(q),
     );
   }, [rawItems, tab, query]);
 
@@ -224,18 +206,10 @@ export function GofileVaultContainer() {
   const onToggleVisibility = (id: string) => {
     setRawItems((prev) =>
       prev.map((it) =>
-        it.id === id
+        it.Id === id
           ? {
               ...it,
-              visibility: it.visibility === "shared" ? "private" : "shared",
-              share:
-                it.visibility === "shared"
-                  ? { enabled: false }
-                  : {
-                      ...(it.share || {}),
-                      enabled: true,
-                      url: it.share?.url || `https://xfile.to/s/${id}`,
-                    },
+              visibility: it.IsShared === false ? "private" : "shared",
             }
           : it,
       ),
@@ -277,31 +251,24 @@ export function GofileVaultContainer() {
   useEffect(() => {
     const dones = queue.filter((t) => t.status === "done");
     if (dones.length === 0) return;
-    const newOnes: VaultItem[] = dones.map((t) => ({
-      id: t.id,
-      name: t.name,
-      gofile_id: t.gofile?.fileId || "",
-      gofile_direct_url: t.gofile?.directLink || null,
-      video_url: t.gofile?.directLink || null,
-      thumbnail_url: "",
-      like_count: 0,
-      is_shared: false,
-      gofile_tags: [],
-      gofile_video_comments: [],
-      user_id: USER_ID ?? null,
-      user: { id: "mock", name: "mock", email: "" },
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      title: t.name,
-      size: t.size,
-      isShared: false,
-      createdAt: new Date().toISOString(),
-      visibility: "private",
-      duration: "",
-      thumbnail: "",
-      mp4Url: t.gofile?.directLink || "",
-      tags: [],
-      share: { url: t.gofile?.downloadPage || "", enabled: false },
+    const newOnes: GofileVideo[] = dones.map((t) => ({
+      Id: t.id,
+      Name: t.name,
+      GofileId: t.gofile?.fileId || "",
+      GofileDirectUrl: t.gofile?.directLink || null,
+      VideoUrl: null,
+      ThumbnailUrl: null,
+      Description: null,
+      PlayCount: 0,
+      LikeCount: 0,
+      IsShared: false,
+      GofileTags: [],
+      GofileVideoComments: [],
+      UserId: USER_ID,
+      User: { Id: USER_ID || "" },
+      HasLike: false,
+      CreatedAt: new Date().toISOString(),
+      UpdatedAt: new Date().toISOString(),
     }));
     setRawItems((prev) => [...newOnes, ...prev]);
     setQueue((prev) => prev.filter((t) => t.status !== "done"));
@@ -328,7 +295,7 @@ export function GofileVaultContainer() {
       onPatchShare={(patch) =>
         setRawItems((prev) =>
           prev.map((i) =>
-            shareFor && i.id === shareFor.id ? { ...i, ...patch } : i,
+            shareFor && i.Id === shareFor.Id ? { ...i, ...patch } : i,
           ),
         )
       }
@@ -339,21 +306,37 @@ export function GofileVaultContainer() {
   );
 }
 
-export const adaptVideoToVaultItem = (v: GofileVideoRes): VaultItem => {
-  const mp4Url = v.video_url || undefined;
-  const createdAtISO = v.created_at;
+export const adaptVideoToGofileVideo = (v: GofileVideoRes): GofileVideo => {
   return {
-    ...v,
-    title: v.name,
-    mp4Url,
-    thumbnail: v.thumbnail_url || undefined,
-    createdAt: createdAtISO,
-    visibility: "private",
-    tags: v.gofile_tags?.map((t) => t.name) ?? [],
-    isShared: v.is_shared,
-    share: v.gofile_direct_url
-      ? { url: v.gofile_direct_url, enabled: false }
-      : undefined,
+    Id: v.id,
+    Name: v.name,
+    GofileId: v.gofile_id,
+    GofileDirectUrl: v.gofile_direct_url,
+    VideoUrl: v.video_url,
+    ThumbnailUrl: v.thumbnail_url,
+    Description: v.description,
+    PlayCount: v.play_count,
+    LikeCount: v.like_count,
+    IsShared: v.is_shared,
+    GofileTags: v.gofile_tags?.map((t) => ({ ID: t.id, Name: t.name })) || [],
+    GofileVideoComments:
+      v.gofile_video_comments?.map((c) => ({
+        ID: c.id,
+        Comment: c.comment,
+        LikeCount: c.like_count,
+        CreatedAt: c.created_at,
+        UpdatedAt: c.updated_at,
+      })) || [],
+    UserId: v.user_id,
+    User: {
+      Id: v.user?.id || "",
+      Name: v.user?.name || "",
+      IconUrl: v.user?.icon_url || "",
+      UserType: v.user?.user_type || "",
+    },
+    HasLike: v.has_like,
+    CreatedAt: toISO(v.created_at) || "",
+    UpdatedAt: toISO(v.updated_at) || "",
   };
 };
 

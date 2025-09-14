@@ -13,12 +13,12 @@ import { VaultTabs } from "@/components/features/Gofile/GofileVault/VaultTabs";
 import { EmptyState } from "@/components/features/Gofile/GofileVault/EmptyState";
 import type {
   UploadTask,
-  VaultItem,
+  GofileVideo,
   Visibility,
 } from "@/components/features/Gofile/GofileVault/types";
 
 export interface GofileVaultPresenterProps {
-  items: VaultItem[]; // 表示対象（フィルタ後）
+  items: GofileVideo[]; // 表示対象（フィルタ後）
   query: string; // 検索文字列
   onQueryChange: (v: string) => void;
   tab: Visibility | "recent"; // タブ状態
@@ -35,12 +35,12 @@ export interface GofileVaultPresenterProps {
   onAddFiles: (files: File[]) => void;
 
   // 共有／可視性
-  shareFor: VaultItem | null;
-  onOpenShare: (item: VaultItem) => void;
+  shareFor: GofileVideo | null;
+  onOpenShare: (item: GofileVideo) => void;
   onCloseShare: () => void;
-  onPatchShare: (patch: Partial<VaultItem>) => void;
+  onPatchShare: (patch: Partial<GofileVideo>) => void;
   onToggleVisibility: (id: string) => void;
-  updateIsShared: (item: VaultItem, isShared: boolean) => void;
+  updateIsShared: (item: GofileVideo, isShared: boolean) => void;
   deleteVideo: (videoId: string) => void;
 }
 
@@ -128,6 +128,7 @@ export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
             onToggleVisibility={onToggleVisibility}
             updateIsShared={updateIsShared}
             deleteVideo={deleteVideo}
+
           />
         ) : (
           <VaultList

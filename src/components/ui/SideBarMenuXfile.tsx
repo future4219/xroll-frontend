@@ -91,6 +91,15 @@ export function SideBarMenuXfile() {
                 </li>
                 <li>
                   <a
+                    href={appUrl.gofileLikeVideo}
+                    className="flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
+                  >
+                    <IoIosHeart className="text-white" size={25} />
+                    <span className="text-white">いいねした動画</span>
+                  </a>
+                </li>
+                <li>
+                  <a
                     href={appUrl.gofileSearch}
                     className="flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
                   >
@@ -98,15 +107,7 @@ export function SideBarMenuXfile() {
                     <span className="text-white">検索</span>
                   </a>
                 </li>
-                <li>
-                  <a
-                    href={appUrl.gofileUpload}
-                    className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
-                  >
-                    <IoCloudUploadOutline className="text-white" size={25} />
-                    <span className="text-white">投稿・保管</span>
-                  </a>
-                </li>
+
                 <li>
                   <a
                     href={appUrl.mainVideoList}
@@ -116,33 +117,7 @@ export function SideBarMenuXfile() {
                     <span className="text-white">Xrollに戻る</span>
                   </a>
                 </li>
-                <li>
-                  <a
-                    href="/policy"
-                    className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
-                  >
-                    <IoIosBook className="text-white" size={25} />
-                    <span className="text-white">規約・免責事項・ポリシー</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/dmca"
-                    className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
-                  >
-                    <IoIosBook className="text-white" size={25} />
-                    <span className="text-white">DMCA</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/usc2257"
-                    className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
-                  >
-                    <IoIosBook className="text-white" size={25} />
-                    <span className="text-white">18 USC 2257 Statement</span>
-                  </a>
-                </li>
+                
               </ul>
             </div>
           </motion.aside>

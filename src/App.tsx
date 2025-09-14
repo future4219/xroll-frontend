@@ -4,7 +4,6 @@ import BootInit from "@/auth/BootInit";
 import { DMCA } from "@/components/pages/DMCA";
 import { Gofile } from "@/components/pages/Gofile";
 import { GofileSearch } from "@/components/pages/GofileSearch";
-import { GofileUpload } from "@/components/pages/GofileUpload";
 import { LikeVideoList } from "@/components/pages/LikeVideoList";
 import { MainVideoList } from "@/components/pages/MainVideoList";
 import { Policy } from "@/components/pages/Policy";
@@ -14,6 +13,7 @@ import { appUrl } from "@/config/url";
 import { GofileVault } from "@/components/pages/GofileVault";
 import { GofileWatch } from "@/components/pages/GofileWatch";
 import { GofileUser } from "@/components/pages/GofileUser";
+import { GofileLikeVideo } from "./components/pages/GofileLikeVideo";
 
 function App() {
   return (
@@ -32,9 +32,9 @@ function App() {
         <Route path={appUrl.gofile} element={<Gofile />} />
         <Route path={appUrl.gofileVault} element={<GofileVault />} />
         <Route path={appUrl.gofileSearch} element={<GofileSearch />} />
-        <Route path={appUrl.gofileUpload} element={<GofileUpload />} />
         <Route path={appUrl.gofileWatch} element={<GofileWatch />} />
         <Route path={appUrl.gofileUser} element={<GofileUser />} />
+        <Route path={appUrl.gofileLikeVideo} element={<GofileLikeVideo />} />
       </Routes>
     </BrowserRouter>
   );

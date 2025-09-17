@@ -1,8 +1,6 @@
-// =============================================
-// File: GofileVaultPresenter.tsx (Presentational)
-// =============================================
+// GofileVaultPresenter.tsx
 import React from "react";
-import { Search, Upload } from "lucide-react";
+import { Search, Upload, AlertTriangle } from "lucide-react";
 import { SideBarMenuXfile } from "@/components/ui/SideBarMenuXfile";
 import { UploadBar } from "@/components/features/Gofile/GofileVault/UploadBar";
 import { UploadDialog } from "@/components/features/Gofile/GofileVault/UploadDialog";
@@ -14,15 +12,14 @@ import { EmptyState } from "@/components/features/Gofile/GofileVault/EmptyState"
 import type { UploadTask, GofileVideo, Visibility } from "@/lib/types";
 
 export interface GofileVaultPresenterProps {
-  items: GofileVideo[]; // 表示対象（フィルタ後）
-  query: string; // 検索文字列
+  items: GofileVideo[];
+  query: string;
   onQueryChange: (v: string) => void;
-  tab: Visibility | "recent"; // タブ状態
+  tab: Visibility | "recent";
   onTabChange: (v: Visibility | "recent") => void;
-  view: "grid" | "list"; // 表示切替
+  view: "grid" | "list";
   onViewChange: (v: "grid" | "list") => void;
 
-  // アップロード周り
   uploadOpen: boolean;
   onUploadOpen: () => void;
   onUploadClose: () => void;
@@ -30,7 +27,6 @@ export interface GofileVaultPresenterProps {
   setQueue: React.Dispatch<React.SetStateAction<UploadTask[]>>;
   onAddFiles: (files: File[]) => void;
 
-  // 共有／可視性
   shareFor: GofileVideo | null;
   onOpenShare: (item: GofileVideo) => void;
   onCloseShare: () => void;
@@ -86,7 +82,7 @@ export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
               />
             </div>
 
-            {/* アップロード（モバイル=アイコン、デスクトップ=ラベル付き） */}
+            {/* アップロード */}
             <button
               onClick={onUploadOpen}
               className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-amber-500/30 bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-md hover:from-amber-400 hover:to-orange-400 sm:hidden"
@@ -102,12 +98,15 @@ export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
             </button>
           </div>
         </div>
-        {/* UploadBar（進捗） */}
+        {/* アップロード進捗 */}
         <UploadBar queue={queue} setQueue={setQueue} />
       </header>
 
       {/* ===== Main ===== */}
       <main className="mx-auto w-full max-w-7xl px-4 pt-24 pb-16">
+        {/* ★ ベータ注意書き（タブの上に表示 / 閉じると今後表示しない） */}
+        <BetaNotice />
+
         <VaultTabs
           tab={tab}
           onChange={onTabChange}
@@ -134,7 +133,7 @@ export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
         )}
       </main>
 
-      {/* Mobile FAB (small screens) */}
+      {/* Mobile FAB */}
       <button
         onClick={onUploadOpen}
         className="fixed bottom-20 right-4 z-[60] inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-xl sm:hidden"
@@ -150,7 +149,6 @@ export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
         onAddFiles={onAddFiles}
         queue={queue}
       />
-
       <ShareDrawer
         item={shareFor}
         onClose={onCloseShare}
@@ -159,3 +157,37 @@ export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
     </div>
   );
 };
+
+/** --- ベータ注意書き（ローカルにdismissを保存） --- */
+function BetaNotice() {
+  const [hidden, setHidden] = React.useState(true);
+
+  React.useEffect(() => {
+    setHidden(localStorage.getItem("xfile.betaNotice.dismissed") === "1");
+  }, []);
+
+  if (hidden) return null;
+
+  const dismiss = () => {
+    localStorage.setItem("xfile.betaNotice.dismissed", "1");
+    setHidden(true);
+  };
+
+  return (
+    <div className="mb-4 flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+      <p className="flex-1 leading-relaxed">
+        <span className="font-semibold">ベータ版のご案内：</span>
+        現在ベータ運用中のため、アップロードした動画は
+        <span className="font-semibold text-amber-300"> 7日後に自動削除</span>
+        されます。重要なデータは別途バックアップしてください。
+      </p>
+      <button
+        onClick={dismiss}
+        className="rounded-lg border border-amber-500/30 bg-amber-500/20 px-3 py-1 text-[12px] font-semibold hover:bg-amber-500/30"
+      >
+        了解
+      </button>
+    </div>
+  );
+}

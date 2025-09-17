@@ -136,9 +136,9 @@ export function GofileSearchPresenter({
             )}
 
             {/* Optional ad banner for larger screens */}
-            <div className="my-4 hidden justify-center sm:flex">
+            {/* <div className="my-4 hidden justify-center sm:flex">
               <JuicyAdsBanner />
-            </div>
+            </div> */}
 
             <VaultGrid items={items} />
 

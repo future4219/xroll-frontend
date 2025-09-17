@@ -1,6 +1,7 @@
 import { SideBarMenuXfile } from "@/components/ui/SideBarMenuXfile";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { appUrl } from "@/config/url";
 
 type Props = {
   email: string;
@@ -10,6 +11,7 @@ type Props = {
   onLogin: () => void;
   loading?: boolean;
   error?: string | null;
+  /** 追加: ゲスト続行ハンドラ（未指定ならボタン非表示） */
 };
 
 /**
@@ -17,6 +19,7 @@ type Props = {
  * - Controlled inputs
  * - Enter submit 対応
  * - エラーバナー & ローディング状態
+ * - ゲストとして続ける（任意）
  */
 export function GofileLoginPresenter({
   email,
@@ -116,6 +119,24 @@ export function GofileLoginPresenter({
             >
               {loading ? "ログイン中..." : "ログイン"}
             </button>
+
+            <div className="my-2 flex items-center gap-3 text-xs text-zinc-500">
+              <span className="h-px flex-1 bg-white/10" />
+              <span>または</span>
+              <span className="h-px flex-1 bg-white/10" />
+            </div>
+            <Link to={appUrl.gofileVault}>
+              <div
+                className="mt-4 w-full rounded-lg border border-white/20 bg-black/40 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                aria-label="ゲストとして続ける"
+              >
+                ゲストとして続ける
+              </div>
+            </Link>
+
+            <p className="mt-2 text-center text-[11px] text-zinc-500">
+              ※ ゲストは一部機能が制限されます
+            </p>
           </form>
 
           {/* 補助リンク */}

@@ -1,5 +1,4 @@
 import React from "react";
-
 import {
   Upload,
   Bell,
@@ -11,18 +10,15 @@ import {
 import { SideBarMenuXfile } from "@/components/ui/SideBarMenuXfile";
 import ProfileIcon from "@/components/ui/ProfileIcon.jpg";
 import { VaultGrid } from "@/components/features/Gofile/GofileVault/VaultGrid";
-import {
-  GofileVideo,
-  User,
-} from "@/components/features/Gofile/GofileVault/types";
+import { GofileVideo, User } from "@/lib/types";
 
 const UPLOAD_URL = "https://upload.gofile.io/uploadfile";
 
 type GofileUserPresenterProps = {
   items: GofileVideo[];
   user: User;
-  onSaveProfile?: (payload: { name: string; bio: string }) => Promise<void>; // ← 追加
-  isMe?: boolean; // ← 追加（自分のページのときだけ編集ボタンを出す用）
+  onSaveProfile?: (payload: { name: string; bio: string }) => Promise<void>;
+  isMe?: boolean;
 };
 
 export function GofileUserPresenter({
@@ -88,58 +84,56 @@ export function GofileUserPresenter({
       );
     }
   };
-  console.log(user.UserType);
+
   return (
     <div className="flex min-h-screen flex-col bg-black text-white">
       {/* Top bar */}
       <header className="fixed top-0 left-0 z-50 w-full text-white">
-        <div className="relative mx-auto flex h-16 max-w-7xl items-center gap-3 px-4">
+        <div className="relative mx-auto flex h-14 max-w-6xl items-center gap-2 px-3 sm:h-16 sm:gap-3 sm:px-4">
           <div className="flex items-center gap-2">
             <SideBarMenuXfile />
-            <div className="text-[15px] font-semibold tracking-tight">
+            <div className="text-sm font-semibold tracking-tight sm:text-[15px]">
               User Profile
             </div>
           </div>
-
-          {/* 検索 */}
           <div className="ml-2 flex flex-1 items-center gap-2">
-            {/* アップロード（モバイル=アイコン、デスクトップ=ラベル付き） */}
+            {/* reserved */}
           </div>
         </div>
-        {/* UploadBar（進捗） */}
       </header>
 
       {/* Page */}
-      <main className="mx-auto w-full max-w-6xl px-4 pt-24 pb-16">
+      <main className="mx-auto w-full max-w-6xl px-3 pt-20 pb-16 sm:px-4 sm:pt-24">
         {/* ===== Channel Header ===== */}
-        <section className="flex items-start gap-6">
+        <section className="grid grid-cols-1 items-start gap-4 sm:gap-6 md:grid-cols-[auto,1fr]">
           {/* Avatar */}
-          <div className="h-28 w-28 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/5">
-            <img
-              alt="avatar"
-              className="h-full w-full object-cover"
-              src={ProfileIcon}
-            />
+          <div className="flex justify-center md:block md:justify-start">
+            <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/5 sm:h-24 sm:w-24 md:h-28 md:w-28">
+              <img
+                alt="avatar"
+                className="h-full w-full object-cover"
+                src={ProfileIcon}
+              />
+            </div>
           </div>
 
           {/* Right side */}
-          <div className="flex min-w-0 flex-1 flex-col">
+          <div className="min-w-0">
             {/* Name line */}
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               {!isEditing ? (
                 <>
-                  <h1 className="truncate text-3xl font-bold tracking-tight">
+                  <h1 className="truncate text-2xl font-bold tracking-tight sm:text-3xl">
                     {user.Name}
                   </h1>
-
-                  {(user.UserType == "SystemAdmin" ||
-                    user.UserType == "OfficialUser") && (
+                  {(user.UserType === "SystemAdmin" ||
+                    user.UserType === "OfficialUser") && (
                     <>
-                      <span className="text-2xl leading-none text-white/60">
+                      <span className="text-xl leading-none text-white/60 sm:text-2xl">
                         ・
                       </span>
                       <BadgeCheck
-                        className="h-5 w-5 text-blue-400"
+                        className="h-4 w-4 text-blue-400 sm:h-5 sm:w-5"
                         aria-label="verified"
                       />
                     </>
@@ -151,24 +145,24 @@ export function GofileUserPresenter({
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="表示名"
-                    className="border-white/15 w-full rounded-lg border bg-black/40 px-3 py-2 text-lg outline-none ring-0 placeholder:text-white/40 focus:border-white/30"
+                    className="border-white/15 w-full rounded-lg border bg-black/40 px-3 py-2 text-base outline-none ring-0 placeholder:text-white/40 focus:border-white/30 sm:text-lg"
                   />
                 </div>
               )}
             </div>
 
             {/* Handle + stats */}
-            <div className="mt-1 flex flex-wrap items-center gap-x-2 text-sm text-white/70">
+            <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-white/70 sm:text-sm">
               <span className="truncate">@{user.Id}</span>
-              <span>・</span>
+              <span className="hidden sm:inline">・</span>
               <span>フォロワー {user.FollowerCount ?? 0}人</span>
-              <span>・</span>
+              <span className="hidden sm:inline">・</span>
               <span>{items.length} 本の動画</span>
             </div>
 
             {/* bio */}
             {!isEditing ? (
-              <p className="line-clamp-2 mt-3 text-sm text-white/80">
+              <p className="line-clamp-2 sm:line-clamp-3 mt-3 text-sm text-white/80">
                 {user.Bio?.trim() ? user.Bio : "説明はありません"}
               </p>
             ) : (
@@ -180,32 +174,31 @@ export function GofileUserPresenter({
                   rows={4}
                   className="border-white/15 w-full rounded-lg border bg-black/40 px-3 py-2 text-sm outline-none placeholder:text-white/40 focus:border-white/30"
                 />
-                <div className="mt-1 text-xs text-white/50">
+                <div className="mt-1 text-right text-xs text-white/50">
                   {bio?.length ?? 0}/500
                 </div>
               </div>
             )}
 
             {/* Actions */}
-            <div className="mt-5 flex flex-wrap items-center gap-2">
+            <div className="mt-4 flex flex-wrap items-center gap-2 sm:mt-5">
               {!isEditing ? (
                 <>
                   {!isMe && (
                     <>
-                      <button className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-white/90">
+                      <button className="xs:w-auto inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-white/90 sm:w-auto">
                         フォローする <span className="ml-0.5">+</span>
                       </button>
-                      <button className="border-white/15 inline-flex items-center gap-1 rounded-full border bg-white/5 px-3 py-2 text-sm hover:bg-white/10">
+                      <button className="xs:w-auto border-white/15 inline-flex w-full items-center justify-center gap-1 rounded-full border bg-white/5 px-3 py-2 text-sm hover:bg-white/10 sm:w-auto">
                         <Bell className="mr-1 h-4 w-4" />
                         通知 <ChevronDown className="ml-0.5 h-4 w-4" />
                       </button>
                     </>
                   )}
-
                   {isMe && (
                     <button
                       onClick={handleStartEdit}
-                      className="border-white/15 inline-flex items-center gap-2 rounded-full border bg-white/5 px-3 py-2 text-sm hover:bg-white/10"
+                      className="xs:w-auto border-white/15 inline-flex w-full items-center justify-center gap-2 rounded-full border bg-white/5 px-3 py-2 text-sm hover:bg-white/10 sm:w-auto"
                     >
                       プロフィールを編集
                     </button>
@@ -216,19 +209,19 @@ export function GofileUserPresenter({
                   <button
                     onClick={handleSave}
                     disabled={saving === "saving"}
-                    className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-white/90 disabled:opacity-60"
+                    className="xs:w-auto inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-white/90 disabled:opacity-60 sm:w-auto"
                   >
                     {saving === "saving" ? "保存中…" : "保存"}
                   </button>
                   <button
                     onClick={handleCancel}
                     disabled={saving === "saving"}
-                    className="border-white/15 inline-flex items-center gap-2 rounded-full border bg-white/5 px-3 py-2 text-sm hover:bg-white/10 disabled:opacity-60"
+                    className="xs:w-auto border-white/15 inline-flex w-full items-center justify-center gap-2 rounded-full border bg-white/5 px-3 py-2 text-sm hover:bg-white/10 disabled:opacity-60 sm:w-auto"
                   >
                     キャンセル
                   </button>
                   {errorMsg && (
-                    <span className="ml-2 text-sm text-red-400">
+                    <span className="ml-0 text-sm text-red-400 sm:ml-2">
                       {errorMsg}
                     </span>
                   )}
@@ -238,18 +231,19 @@ export function GofileUserPresenter({
           </div>
         </section>
 
-        <div className="mx-auto w-full max-w-7xl px-4 pt-24 pb-16">
-          <div className="mb-6 flex items-center justify-between text-xl font-bold">
+        {/* Videos */}
+        <section className="mx-auto w-full max-w-6xl pt-10 sm:pt-12">
+          <div className="mb-4 flex items-center justify-between text-base font-bold sm:mb-6 sm:text-xl">
             公開されている動画
           </div>
           {items.length === 0 ? (
-            <div className="py-10 text-center text-zinc-500">
+            <div className="py-8 text-center text-zinc-500 sm:py-10">
               <p>このユーザーの動画はまだありません。</p>
             </div>
           ) : (
             <VaultGrid items={items} />
           )}
-        </div>
+        </section>
       </main>
     </div>
   );

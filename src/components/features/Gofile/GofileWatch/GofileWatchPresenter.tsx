@@ -1,22 +1,8 @@
 import { SideBarMenuXfile } from "@/components/ui/SideBarMenuXfile";
-import React, { useEffect, useMemo, useState } from "react";
-import { GofileVideo } from "@/components/features/Gofile/GofileVault/types";
+import React, { useEffect, useState } from "react";
 import ProfileIcon from "@/components/ui/ProfileIcon.jpg";
 import { Link } from "react-router-dom";
-import { appUrl } from "@/config/url";
-
-export type WatchItem = {
-  id: string;
-  title: string;
-  mp4Url?: string;
-  thumbnail?: string;
-  channel?: string;
-  uploadedAt?: string;
-  description?: string;
-  tags?: string[];
-  likeCount?: number;
-  views?: number; // ★追加
-};
+import { GofileVideo } from "@/lib/types";
 
 export type WatchComment = {
   id: string;
@@ -31,14 +17,10 @@ export interface GofileWatchPresenterProps {
   error?: string | null;
   videoRef?: React.RefObject<HTMLVideoElement>;
 
-  // ★追加: インタラクション
   onLoadMoreComments?: () => void;
-
-  // ★追加: コメント閲覧用
   comments?: WatchComment[];
   hasMoreComments?: boolean;
 
-  // ★追加: 動画の更新
   updateVideo: (next: GofileVideo) => Promise<void> | void;
   likeVideo: (videoId: string | undefined) => Promise<void> | void;
   unlikeVideo: (videoId: string | undefined) => Promise<void> | void;
@@ -111,39 +93,51 @@ export const GofileWatchPresenter: React.FC<GofileWatchPresenterProps> = ({
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <header className="fixed top-0 left-0 z-50 w-full bg-black text-white">
-        <div className="relative mx-auto flex h-16 max-w-7xl items-center gap-3 px-4">
+      {/* Header */}
+      <header className="supports-[backdrop-filter]:bg-black/60 fixed top-0 left-0 z-50 w-full bg-black/90 backdrop-blur">
+        <div className="relative mx-auto flex h-14 max-w-6xl items-center gap-2 px-3 sm:h-16 sm:gap-3 sm:px-4">
           <div className="flex items-center gap-2">
             <SideBarMenuXfile />
-            <div className="text-[15px] font-semibold tracking-tight">
+            <div className="text-sm font-semibold tracking-tight sm:text-[15px]">
               Watch
             </div>
           </div>
         </div>
       </header>
 
-      <div className="mx-auto mt-8 w-full max-w-6xl px-4 py-10">
+      <div className="h-14 sm:h-16" />
+
+      {/* Page */}
+      <main className="pt-18 mx-auto w-full max-w-6xl px-0 pb-16 sm:px-4 sm:pt-24">
         {/* Player */}
-        <div className="overflow-hidden rounded-3xl bg-black shadow-[0_30px_120px_-40px_rgba(0,0,0,0.9)] ring-1 ring-white/10">
-          <video
-            ref={videoRef}
-            className="aspect-video w-full bg-black"
-            src={`${XROLL_API_ENDPOINT}/gofile/proxy?id=${item?.Id}`}
-            poster={item?.ThumbnailUrl ?? undefined}
-            controls
-            playsInline
-            autoPlay
-            preload="metadata"
-          />
+        {/* モバイルは左右フルブリードにして存在感UP */}
+        <div className="-mx-0 sm:mx-0">
+          <div className="overflow-hidden rounded-none bg-black shadow-[0_30px_120px_-40px_rgba(0,0,0,0.9)] ring-0 sm:rounded-3xl sm:ring-1 sm:ring-white/10">
+            <video
+              ref={videoRef}
+              // ★モバイルは高さ基準（約45vh）。PCはこれまで通り aspect-video。
+              className="h-[45vh] w-full bg-black object-contain sm:aspect-video sm:h-auto"
+              src={
+                item?.Id
+                  ? `${XROLL_API_ENDPOINT}/gofile/proxy?id=${item.Id}`
+                  : undefined
+              }
+              poster={item?.ThumbnailUrl ?? undefined}
+              controls
+              playsInline
+              autoPlay
+              preload="metadata"
+            />
+          </div>
         </div>
 
-        {/* タイトル or 編集フィールド */}
+        {/* Title / Edit field */}
         {!isEditing ? (
-          <h1 className="mt-5 text-[22px] font-semibold leading-snug tracking-tight">
+          <h1 className="mt-4 text-[18px] font-semibold leading-snug tracking-tight sm:mt-5 sm:text-[22px]">
             {item?.Name || (loading ? "\u00A0" : "(無題)")}
           </h1>
         ) : (
-          <div className="mt-5">
+          <div className="mt-4 sm:mt-5">
             <input
               className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[16px] text-zinc-100 placeholder:text-zinc-500 focus:border-blue-500 focus:outline-none"
               placeholder="タイトルを入力"
@@ -154,77 +148,79 @@ export const GofileWatchPresenter: React.FC<GofileWatchPresenterProps> = ({
           </div>
         )}
 
-        {/* メタ＋アクション */}
-        <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-zinc-400">
-          <Link to={`/gofile/user?id=${item?.UserId}`}>
+        {/* Meta + Actions */}
+        <div className="mt-3 flex flex-wrap items-center gap-2.5 text-xs text-zinc-400 sm:mt-4 sm:gap-3 sm:text-sm">
+          <Link to={`/gofile/user?id=${item?.UserId}`} className="shrink-0">
             <img
               alt="avatar"
-              className="h-8 w-8 rounded-full bg-white/5 object-cover"
+              className="h-7 w-7 rounded-full bg-white/5 object-cover sm:h-8 sm:w-8"
               src={ProfileIcon}
             />
           </Link>
-          <Link to={`?id=${item?.UserId}`}>
-            <span className="text-zinc-100">{item?.User.Name}</span>
+
+          <Link to={`/gofile/user?id=${item?.UserId}`} className="min-w-0">
+            <span className="truncate text-zinc-100">{item?.User.Name}</span>
           </Link>
-          <span className="opacity-50">•</span>
-          <span>{item?.PlayCount.toLocaleString()} 回視聴</span>
+
+          <span className="hidden opacity-50 sm:inline">•</span>
+          <span>{(item?.PlayCount ?? 0).toLocaleString()} 回視聴</span>
+
           {item?.CreatedAt && (
             <>
               <span className="opacity-50">•</span>
-              <span>{item.CreatedAt}</span>
+              <span className="truncate">{item.CreatedAt}</span>
             </>
           )}
-          {/* 日時の横に配置（いいね） */}
-          <span className="opacity-50">•</span>
-          <button
-            onClick={() => {
-              if (item?.HasLike) {
-                unlikeVideo(item?.Id);
-              } else {
-                likeVideo(item?.Id);
-              }
-            }}
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs text-zinc-100 hover:bg-white/[0.12]"
-          >
-            <span className="i-lucide-thumbs-up mr-0.5" />
-            いいね {item?.LikeCount}
-          </button>
 
-          {item?.UserId === USER_ID && (
-            <>
-              {!isEditing ? (
-                <div className="ml-auto flex items-center gap-2">
+          {/* Like button */}
+          <div className="ms-auto flex items-center gap-2 sm:gap-3">
+            <button
+              onClick={() => {
+                if (!item?.Id) return;
+                if (item?.HasLike) unlikeVideo(item.Id);
+                else likeVideo(item.Id);
+              }}
+              className="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs text-zinc-100 hover:bg-white/[0.12] sm:w-auto sm:text-sm"
+            >
+              <span className="i-lucide-thumbs-up mr-0.5" />
+              いいね {item?.LikeCount ?? 0}
+            </button>
+
+            {/* Edit buttons (owner only) */}
+            {item?.UserId === USER_ID && (
+              <>
+                {!isEditing ? (
                   <button
                     onClick={onClickEdit}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs text-zinc-100 hover:bg-white/[0.12]"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs text-zinc-100 hover:bg-white/[0.12] sm:w-auto sm:text-sm"
                     disabled={!item}
                   >
                     編集
                   </button>
-                </div>
-              ) : (
-                <div className="ml-auto flex items-center gap-2">
-                  <button
-                    onClick={onSave}
-                    disabled={saving}
-                    className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/20 px-3 py-1.5 text-xs text-blue-100 hover:bg-blue-500/30 disabled:opacity-60"
-                  >
-                    {saving ? "保存中…" : "保存"}
-                  </button>
-                  <button
-                    onClick={onCancelEdit}
-                    disabled={saving}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs text-zinc-100 hover:bg-white/[0.12] disabled:opacity-60"
-                  >
-                    キャンセル
-                  </button>
-                </div>
-              )}
-            </>
-          )}
+                ) : (
+                  <>
+                    <button
+                      onClick={onSave}
+                      disabled={saving}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/20 px-3 py-1.5 text-xs text-blue-100 hover:bg-blue-500/30 disabled:opacity-60 sm:w-auto sm:text-sm"
+                    >
+                      {saving ? "保存中…" : "保存"}
+                    </button>
+                    <button
+                      onClick={onCancelEdit}
+                      disabled={saving}
+                      className="inline-flex w-full　items-center justify-center gap-2 whitespace-nowrap whitespace-nowrap rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs text-zinc-100 hover:bg-white/[0.12] disabled:opacity-60 sm:w-auto sm:text-sm"
+                    >
+                      キャンセル
+                    </button>
+                  </>
+                )}
+              </>
+            )}
+          </div>
         </div>
 
-        {/* エラー / ローディング */}
+        {/* States */}
         {loading && (
           <div className="mt-3 text-sm text-zinc-400">読み込み中…</div>
         )}
@@ -239,18 +235,17 @@ export const GofileWatchPresenter: React.FC<GofileWatchPresenterProps> = ({
           </div>
         )}
 
-        {/* 説明・タグ（閲覧 or 編集） */}
+        {/* Description / Tags */}
         {!isEditing ? (
           <>
             {(item?.Description ||
               (item?.GofileTags && item.GofileTags.length > 0)) && (
-              <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-zinc-200">
+              <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-zinc-200 sm:mt-6 sm:p-5">
                 {item?.Description && (
                   <p className="whitespace-pre-wrap leading-relaxed">
                     {item.Description}
                   </p>
                 )}
-
                 {item?.GofileTags && item.GofileTags.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {item.GofileTags.map((t) => (
@@ -266,18 +261,18 @@ export const GofileWatchPresenter: React.FC<GofileWatchPresenterProps> = ({
               </div>
             )}
             {item?.Description === "" && (
-              <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-zinc-200">
+              <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-zinc-200 sm:mt-6 sm:p-5">
                 <p className="leading-relaxed">説明はありません。</p>
               </div>
             )}
           </>
         ) : (
-          <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5">
+          <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4 sm:mt-6 sm:p-5">
             <label className="mb-2 block text-xs font-semibold text-zinc-300">
               説明
             </label>
             <textarea
-              className="h-32 w-full resize-y rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-blue-500 focus:outline-none"
+              className="h-28 w-full resize-y rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-blue-500 focus:outline-none sm:h-32"
               placeholder="説明を入力"
               value={editDesc}
               onChange={(e) => setEditDesc(e.target.value)}
@@ -288,9 +283,12 @@ export const GofileWatchPresenter: React.FC<GofileWatchPresenterProps> = ({
           </div>
         )}
 
-        {/* コメント（閲覧） */}
-        <section className="mt-8">
-          <h2 className="mb-3 text-sm font-semibold text-zinc-300">コメント</h2>
+        {/* Comments */}
+        <section className="mt-7 sm:mt-8">
+          <h2 className="mb-2 text-xs font-semibold text-zinc-300 sm:mb-3 sm:text-sm">
+            コメント
+          </h2>
+
           <div className="mt-2">
             <textarea
               className="w-full resize-none rounded-md border border-white/10 bg-white/5 p-2 text-sm text-zinc-100 placeholder:text-zinc-400 focus:border-blue-500 focus:outline-none"
@@ -298,19 +296,20 @@ export const GofileWatchPresenter: React.FC<GofileWatchPresenterProps> = ({
               placeholder="コメントを書く..."
             />
           </div>
+
           {comments.length === 0 ? (
             <div className="mt-2 rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm text-zinc-400">
               まだコメントはありません。
             </div>
           ) : (
-            <ul className="space-y-3">
+            <ul className="mt-3 space-y-3">
               {comments.map((c) => (
                 <li
                   key={c.id}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 sm:p-4"
                 >
-                  <div className="mb-1 flex items-center gap-2">
-                    <div className="h-6 w-6 overflow-hidden rounded-full bg-white/10">
+                  <div className="mb-2 flex items-center gap-2">
+                    <div className="h-6 w-6 shrink-0 overflow-hidden rounded-full bg-white/10">
                       {c.user.avatarUrl ? (
                         <img
                           src={c.user.avatarUrl}
@@ -324,10 +323,12 @@ export const GofileWatchPresenter: React.FC<GofileWatchPresenterProps> = ({
                         />
                       ) : null}
                     </div>
-                    <div className="text-xs text-zinc-400">
-                      <span className="text-zinc-200">{c.user.name}</span>
+                    <div className="min-w-0 text-[11px] text-zinc-400 sm:text-xs">
+                      <span className="truncate text-zinc-200">
+                        {c.user.name}
+                      </span>
                       <span className="mx-1">•</span>
-                      <span>{c.createdAt}</span>
+                      <span className="truncate">{c.createdAt}</span>
                     </div>
                   </div>
                   <p className="whitespace-pre-wrap text-sm text-zinc-100">
@@ -347,7 +348,7 @@ export const GofileWatchPresenter: React.FC<GofileWatchPresenterProps> = ({
             </button>
           )}
         </section>
-      </div>
+      </main>
     </div>
   );
 };

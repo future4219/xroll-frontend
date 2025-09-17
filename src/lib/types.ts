@@ -143,6 +143,16 @@ export type User = {
   [k: string]: any;
 };
 
+export function newUser(): User {
+  return {
+    Id: "",
+    Name: "",
+    IconUrl: "",
+    UserType: "",
+    Bio: "",
+  };
+}
+
 export function adaptUserResToUser(u: UserRes): User {
   return {
     Id: u.id,
@@ -177,4 +187,14 @@ export type GofileUpdateReq = {
   description: string;
   is_shared: boolean;
   tag_ids: string[]; // タグ名の配列
+};
+
+export type VerifyEmailRes = {
+  accessToken: string;
+  tokenType: string;
+  user: {
+    userId: string;
+    email: string;
+    userType: string;
+  };
 };

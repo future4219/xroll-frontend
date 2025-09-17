@@ -7,7 +7,7 @@ import type {
   GofileVideo,
   Visibility,
   GofileUpdateReq,
-} from "@/components/features/Gofile/GofileVault/types";
+} from "@/lib/types";
 import axios from "axios";
 import { GofileVaultPresenter } from "@/components/features/Gofile/GofileVault/GofileVaultPresenter";
 // 変更点のみ（ファイル先頭部）
@@ -318,9 +318,10 @@ export const adaptVideoToGofileVideo = (v: GofileVideoRes): GofileVideo => {
     PlayCount: v.play_count,
     LikeCount: v.like_count,
     IsShared: v.is_shared,
-    GofileTags: v.gofile_tags?.map((t) => ({ ID: t.id, Name: t.name })) || [],
+    GofileTags:
+      v.gofile_tags?.map((t: any) => ({ ID: t.id, Name: t.name })) || [],
     GofileVideoComments:
-      v.gofile_video_comments?.map((c) => ({
+      v.gofile_video_comments?.map((c: any) => ({
         ID: c.id,
         Comment: c.comment,
         LikeCount: c.like_count,

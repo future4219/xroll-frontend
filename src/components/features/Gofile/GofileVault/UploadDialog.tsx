@@ -1,6 +1,6 @@
 import { X, Upload, CheckCircle2, Trash2 } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
-import { UploadTask } from "@/components/features/Gofile/GofileVault/types";
+import { UploadTask } from "@/lib/types";
 import { formatBytes } from "@/components/features/Gofile/GofileVault/utils";
 
 export function UploadDialog({
@@ -41,13 +41,19 @@ export function UploadDialog({
   };
 
   const handleFiles = (files: File[]) => {
-    const staged = files.map((f) => ({
+    const validFiles = files.filter((f) => f.type.startsWith("video/"));
+
+    if (validFiles.length < files.length) {
+      alert("動画ファイル（mp4, mov, avi など）のみアップロードできます。");
+    }
+
+    const staged = validFiles.map((f) => ({
       id: `${f.name}_${Math.random().toString(36).slice(2, 8)}`,
       name: f.name,
       size: f.size,
       file: f,
     }));
-    setLocal((l) => [...staged, ...l]); // ここではまだキュー投入しない
+    setLocal((l) => [...staged, ...l]);
   };
 
   // 行ごとの完了判定：開始済み かつ （queue上でdone もしくは queueから消えている）
@@ -109,6 +115,7 @@ export function UploadDialog({
             ref={inputRef}
             type="file"
             multiple
+            accept="video/*" // ★動画ならOK（mp4, mov など）
             onChange={(e) =>
               e.target.files && handleFiles(Array.from(e.target.files))
             }

@@ -1,5 +1,5 @@
 import { VisibilityBadge } from "@/components/features/Gofile/GofileVault/VisibilityBadge";
-import { GofileVideo } from "@/components/features/Gofile/GofileVault/types";
+import { GofileVideo } from "@/lib/types";
 import { copy, timeAgo } from "@/components/features/Gofile/GofileVault/utils";
 import { BadgeCheck, Copy, Eye, EyeOff, Settings } from "lucide-react";
 import React from "react";
@@ -78,9 +78,11 @@ export function VaultGrid({
               ) : (
                 <div className="aspect-video w-full rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-900" />
               )}
-              <div className="absolute top-2 left-2">
-                <VisibilityBadge v={it.IsShared ? "shared" : "private"} />
-              </div>
+              {onShare && (
+                <div className="absolute top-2 left-2">
+                  <VisibilityBadge v={it.IsShared ? "shared" : "private"} />
+                </div>
+              )}
               {/* {it.duration && (
                 <span className="absolute bottom-2 right-2 rounded bg-black/70 px-1.5 py-0.5 text-xs">
                   {3}
@@ -146,7 +148,7 @@ export function VaultGrid({
             </div>
 
             <div className="mt-3 flex items-center gap-2">
-              {it.IsShared && (
+              {onShare && (
                 <button
                   onClick={(e) => {
                     stop(e);

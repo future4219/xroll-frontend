@@ -1,4 +1,4 @@
-import { GofileUserContainer } from "@/components/features/Gofile/GofileUserContainer";
+import { GofileUserContainer } from "@/components/features/Gofile/GofileUser/GofileUserContainer";
 
 export function GofileUser() {
   return <GofileUserContainer />;

@@ -1,9 +1,5 @@
 import { LayoutGrid, List } from "lucide-react";
-import {
-  UploadTask,
-  GofileVideo,
-  Visibility,
-} from "@/components/features/Gofile/GofileVault/types";
+import { UploadTask, GofileVideo, Visibility } from "@/lib/types";
 
 // ============================== Sub Components ==============================
 export function VaultTabs({

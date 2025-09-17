@@ -1,12 +1,8 @@
-import { GofileLikeVideoPresenter } from "@/components/features/Gofile/GofileLikeVideoPresenter";
+import { GofileLikeVideoPresenter } from "@/components/features/Gofile/GofileLike/GofileLikeVideoPresenter";
 import api from "@/lib/api";
 import { useEffect, useMemo, useState } from "react";
 import { adaptVideoToGofileVideo } from "@/components/features/Gofile/GofileVault/GofileVaultContainer";
-import {
-  GofileVideoListRes,
-  GofileVideoRes,
-  GofileVideo,
-} from "@/components/features/Gofile/GofileVault/types";
+import { GofileVideoListRes, GofileVideoRes, GofileVideo } from "@/lib/types";
 
 export function GofileLikeVideoContainer() {
   const apiUrl = import.meta.env.VITE_API_URL;

@@ -1,11 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import api from "@/lib/api";
 import { adaptVideoToGofileVideo } from "@/components/features/Gofile/GofileVault/GofileVaultContainer";
-import {
-  GofileVideoListRes,
-  GofileVideoRes,
-  GofileVideo,
-} from "@/components/features/Gofile/GofileVault/types";
+import { GofileVideoListRes, GofileVideoRes, GofileVideo } from "@/lib/types";
 import { GofileSearchPresenter } from "./GofileSearchPresenter";
 
 const DEFAULT_LIMIT = 30;

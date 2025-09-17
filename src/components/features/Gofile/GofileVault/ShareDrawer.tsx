@@ -1,6 +1,6 @@
 import { X, LinkIcon, Copy, Hash, Clock, Lock } from "lucide-react";
 import { useState, useEffect } from "react";
-import { GofileVideo } from "@/components/features/Gofile/GofileVault/types";
+import { GofileVideo } from "@/lib/types";
 import { copy } from "./utils";
 
 export function ShareDrawer({

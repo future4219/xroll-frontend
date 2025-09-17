@@ -1,7 +1,7 @@
-import { GofileUserPresenter } from "@/components/features/Gofile/GofileUserPresenter";
+import { GofileUserPresenter } from "@/components/features/Gofile/GofileUser/GofileUserPresenter";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
-import { adaptVideoToGofileVideo } from "./GofileVault/GofileVaultContainer";
+import { adaptVideoToGofileVideo } from "../GofileVault/GofileVaultContainer";
 import {
   GofileVideoListRes,
   GofileVideoRes,
@@ -9,7 +9,7 @@ import {
   User,
   adaptUserResToUser,
   UserRes,
-} from "@/components/features/Gofile/GofileVault/types";
+} from "@/lib/types";
 import api from "@/lib/api";
 
 export function GofileUserContainer() {

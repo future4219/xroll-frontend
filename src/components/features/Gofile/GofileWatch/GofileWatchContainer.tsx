@@ -5,8 +5,8 @@ import {
   GofileVideo,
   GofileVideoRes,
   GofileVideoResToGofileVideo,
-} from "./GofileVault/types";
-import { WatchItem, GofileWatchPresenter } from "./GofileWatchPresenter";
+} from "../../../../lib/types";
+import { GofileWatchPresenter } from "./GofileWatchPresenter";
 import React from "react";
 
 export function GofileWatchContainer() {

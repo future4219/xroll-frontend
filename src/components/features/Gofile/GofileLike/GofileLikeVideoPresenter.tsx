@@ -1,7 +1,7 @@
 import { SideBarMenuXfile } from "@/components/ui/SideBarMenuXfile";
 import { Search } from "lucide-react";
-import { GofileVideo } from "./GofileVault/types";
-import { VaultGrid } from "./GofileVault/VaultGrid";
+import { GofileVideo } from "../../../../lib/types";
+import { VaultGrid } from "../GofileVault/VaultGrid";
 
 type GofileLikeVideoPresenterProps = {
   items: GofileVideo[];

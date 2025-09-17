@@ -1,8 +1,5 @@
 import { Dispatch } from "react";
-import {
-  UploadTask,
-
-} from "@/components/features/Gofile/GofileVault/types";
+import { UploadTask } from "@/lib/types";
 
 export function UploadBar({
   queue,

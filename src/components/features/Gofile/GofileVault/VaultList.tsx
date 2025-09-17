@@ -1,9 +1,5 @@
 import { Copy, Settings, EyeOff, Eye } from "lucide-react";
-import {
-  UploadTask,
-  GofileVideo,
-  Visibility,
-} from "@/components/features/Gofile/GofileVault/types";
+import { UploadTask, GofileVideo, Visibility } from "@/lib/types";
 import { VisibilityBadge } from "./VisibilityBadge";
 import {
   formatBytes,

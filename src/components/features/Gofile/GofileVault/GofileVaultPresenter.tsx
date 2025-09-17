@@ -11,11 +11,7 @@ import { VaultGrid } from "@/components/features/Gofile/GofileVault/VaultGrid";
 import { VaultList } from "@/components/features/Gofile/GofileVault/VaultList";
 import { VaultTabs } from "@/components/features/Gofile/GofileVault/VaultTabs";
 import { EmptyState } from "@/components/features/Gofile/GofileVault/EmptyState";
-import type {
-  UploadTask,
-  GofileVideo,
-  Visibility,
-} from "@/components/features/Gofile/GofileVault/types";
+import type { UploadTask, GofileVideo, Visibility } from "@/lib/types";
 
 export interface GofileVaultPresenterProps {
   items: GofileVideo[]; // 表示対象（フィルタ後）
@@ -128,7 +124,6 @@ export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
             onToggleVisibility={onToggleVisibility}
             updateIsShared={updateIsShared}
             deleteVideo={deleteVideo}
-
           />
         ) : (
           <VaultList

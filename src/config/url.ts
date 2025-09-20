@@ -6,6 +6,16 @@ export const appUrl = {
   twitterVideoSave: "/twitter-video-save",
   dmca: "/dmca",
   usc2257: "/usc2257",
+  gofile: "/gofile",
+  gofileLogin: "/gofile/login",
+  gofileRegister: "/gofile/register",
+  gofileVerify: "/gofile/verify",
+  gofileVault: "/gofile/vault",
+  gofileSearch: "/gofile/search",
+  gofileUpload: "/gofile/upload",
+  gofileWatch: "/gofile/watch",
+  gofileUser: "/gofile/user",
+  gofileLikeVideo: "/gofile/like-video",
 
   // 動的にクエリ付きURLを返す関数
   mainVideoListWithView: (view: "reels" | "thumbs") => `/?view=${view}`,

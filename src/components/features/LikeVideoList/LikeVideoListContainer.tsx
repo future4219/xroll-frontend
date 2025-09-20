@@ -50,7 +50,6 @@ export function LikeVideoListContainer() {
       });
 
       setLikeVideos(response.data.videos);
-      console.log(response);
     } catch (error) {
       console.error("APIエラー:", error);
     }
@@ -58,7 +57,6 @@ export function LikeVideoListContainer() {
   //初回ロード：localStorage に保存された liked フラグを持つ動画を取得
   useEffect(() => {
     const likedVideos = getLikedVideoIds();
-    console.log(likedVideos.map((video) => video.id));
     fetchVideosByIds(likedVideos.map((video) => video.id));
   }, []);
 
@@ -78,7 +76,6 @@ export function LikeVideoListContainer() {
 
     try {
       const response = await axios.post(`${apiUrl}/videos/${id}/like`);
-      console.log(response.data);
       localStorage.setItem(`liked_${id}`, "true");
     } catch (error) {
       console.error("APIエラー:", error);
@@ -90,7 +87,6 @@ export function LikeVideoListContainer() {
       const response = await axios.post(`${apiUrl}/videos/${id}/comment`, {
         comment,
       });
-      console.log(response.data);
     } catch (error) {
       console.error("APIエラー:", error);
     }

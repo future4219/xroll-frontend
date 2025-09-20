@@ -323,6 +323,9 @@ export const adaptVideoToGofileVideo = (v: GofileVideoRes): GofileVideo => {
     GofileVideoComments:
       v.gofile_video_comments?.map((c: any) => ({
         ID: c.id,
+        GofileVideoID: c.gofile_video_id,
+        UserID: c.user_id,
+        User: adaptVideoToGofileVideo(c.user),
         Comment: c.comment,
         LikeCount: c.like_count,
         CreatedAt: c.created_at,

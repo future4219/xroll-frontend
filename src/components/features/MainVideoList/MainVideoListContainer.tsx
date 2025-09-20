@@ -22,10 +22,6 @@ export function MainVideoListContainer() {
         params: { offset: currentOffset, limit },
       });
 
-      console.log(response.data);
-      // 取得した動画を既存のリストに連結
-
-
       setVideos((prev) => [...prev, ...response.data.videos]);
       // オフセットを更新
       setOffset(currentOffset + limit);
@@ -51,8 +47,7 @@ export function MainVideoListContainer() {
     }
 
     try {
-      const response = await axios.post(`${apiUrl}/videos/like/${id}`);
-      console.log(response.data);
+       await axios.post(`${apiUrl}/videos/like/${id}`);
       localStorage.setItem(`liked_${id}`, "true");
     } catch (error) {
       console.error("APIエラー:", error);

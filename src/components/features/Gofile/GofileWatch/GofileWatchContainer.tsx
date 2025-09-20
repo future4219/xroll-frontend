@@ -59,7 +59,6 @@ export function GofileWatchContainer() {
         const detail = await api.get<GofileVideoRes>(
           `${apiUrl}/gofile/video/${videoId}`,
         );
-        console.log("Fetched video detail:", detail);
         if (aborted) return;
         const v = detail.data;
         setItem(GofileVideoResToGofileVideo(v));
@@ -90,7 +89,6 @@ export function GofileWatchContainer() {
       );
       if (res.status === 200) {
         setItem((prev) => (prev?.Id === item.Id ? { ...prev, ...item } : prev));
-        console.log("Updated video:", item.Id, item);
       } else {
         console.error("Failed to update video:", res);
       }
@@ -108,7 +106,6 @@ export function GofileWatchContainer() {
             ? { ...prev, LikeCount: (prev.LikeCount || 0) + 1, HasLike: true }
             : prev,
         );
-        console.log("Liked video:", videoId);
       } else {
         console.error("Failed to like video:", res);
       }
@@ -131,7 +128,6 @@ export function GofileWatchContainer() {
               }
             : prev,
         );
-        console.log("Unliked video:", videoId);
       } else {
         console.error("Failed to unlike video:", res);
       }
@@ -170,7 +166,6 @@ export function GofileWatchContainer() {
             : prev,
         );
         setCommentText("");
-        console.log("Added comment to video:", item.Id);
       } else {
         console.error("Failed to add comment:", res);
       }

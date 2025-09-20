@@ -41,7 +41,6 @@ export function TwitterVideoSaveContainer() {
     setIsLoading(false);
   };
 
-  console.log(error);
   return (
     <TwitterVideoSavePresenter
       getTwitterVideoByUrl={getTwitterVideoByUrl}

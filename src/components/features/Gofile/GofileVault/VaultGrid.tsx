@@ -26,7 +26,6 @@ export function VaultGrid({
     e.stopPropagation();
     e.preventDefault();
   };
-  console.log("VaultGrid items:", items);
   const [shareConfirmModalOpen, setShareConfirmModalOpen] =
     React.useState(false);
 
@@ -218,7 +217,6 @@ export function VaultGrid({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  console.log("Updating share status for:", selectedItem);
                   updateIsShared?.(selectedItem, !selectedItem.IsShared);
                   setShareConfirmModalOpen(false);
                 }}
@@ -249,7 +247,6 @@ export function VaultGrid({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  console.log("Deleting video:", selectedItem);
                   deleteVideo?.(selectedItem.Id);
                   setDeleteConfirmModalOpen(false);
                 }}

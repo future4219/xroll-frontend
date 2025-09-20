@@ -59,14 +59,18 @@ export function VaultGrid({
   const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] =
     React.useState(false);
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
       {items.map((it) => {
         const href = buildWatchHref(it);
         return (
           <Link
             key={it.Id}
             to={href}
-            className="group block rounded-2xl border border-white/10 bg-white/[0.03] p-3 transition hover:border-white/20 hover:bg-white/[0.05] focus:outline-none focus:ring-2 focus:ring-amber-500/60"
+            className="group block rounded-none border-0 bg-transparent p-0 hover:bg-transparent
+                        focus:outline-none focus:ring-0 sm:gap-3
+                        sm:rounded-2xl sm:border sm:border-white/10 sm:bg-white/[0.03] sm:p-3
+                      sm:hover:border-white/20 sm:hover:bg-white/[0.05]
+                        sm:focus:ring-2 sm:focus:ring-amber-500/60"
           >
             <div className="relative">
               {it.ThumbnailUrl ? (

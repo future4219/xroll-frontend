@@ -10,6 +10,9 @@ export interface GofileTagRes {
 
 export interface GofileVideoCommentRes {
   id: string;
+  gofile_video_id: string;
+  user_id: string;
+  user: UserRes;
   comment: string;
   like_count: number;
   created_at: string; // "2006-01-02 15:04:05"
@@ -101,6 +104,9 @@ export function GofileVideoResToGofileVideo(v: GofileVideoRes): GofileVideo {
     })),
     GofileVideoComments: v.gofile_video_comments.map((c) => ({
       ID: c.id,
+      GofileVideoID: v.id,
+      UserID: c.user_id,
+      User: adaptUserResToUser(c.user), // コメントのユーザー情報は含まれないので空で初期化
       Comment: c.comment,
       LikeCount: c.like_count,
       CreatedAt: c.created_at,
@@ -128,6 +134,9 @@ export type GofileTag = {
 
 export type GofileVideoComment = {
   ID: string;
+  GofileVideoID: string;
+  UserID: string;
+  User: User;
   Comment: string;
   LikeCount: number;
   CreatedAt: string; // "2006-01-02 15:04:05"

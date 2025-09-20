@@ -14,6 +14,7 @@ export function GofileWatchContainer() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [item, setItem] = useState<GofileVideo | undefined>(undefined);
+  const [commentText, setCommentText] = useState("");
   const [booted, setBooted] = useState(false); // ← Boot完了フラグ
 
   const apiUrl = import.meta.env.VITE_API_URL;
@@ -139,6 +140,44 @@ export function GofileWatchContainer() {
     }
   }, []);
 
+  const onSubmitComment = React.useCallback(async () => {
+    if (!commentText.trim()) return;
+    if (!item?.Id) return;
+    try {
+      const res = await api.post(`${BACKEND_LIST_BASE}/comment/${item.Id}`, {
+        comment: commentText.trim(),
+      });
+      if (res.status === 200) {
+        const newComment = res.data;
+        setItem((prev) =>
+          prev && prev.Id === item.Id
+            ? {
+                ...prev,
+                GofileVideoComments: [
+                  ...(prev.GofileVideoComments || []),
+                  {
+                    ID: newComment.id,
+                    GofileVideoID: newComment.gofile_video_id,
+                    UserID: newComment.user_id,
+                    User: newComment.user,
+                    Comment: newComment.comment,
+                    LikeCount: newComment.like_count,
+                    CreatedAt: newComment.created_at,
+                    UpdatedAt: newComment.updated_at,
+                  },
+                ],
+              }
+            : prev,
+        );
+        setCommentText("");
+        console.log("Added comment to video:", item.Id);
+      } else {
+        console.error("Failed to add comment:", res);
+      }
+    } catch (e) {
+      console.error("POST /api/gofile/comment/:id failed:", e);
+    }
+  }, [commentText, item?.Id]);
   // cleanup on unmount
   useEffect(() => {
     return () => {
@@ -161,6 +200,9 @@ export function GofileWatchContainer() {
       updateVideo={updateVideo}
       likeVideo={likeVideo}
       unlikeVideo={unlikeVideo}
+      commentText={commentText}
+      setCommentText={setCommentText}
+      onSubmitComment={onSubmitComment}
     />
   );
 }

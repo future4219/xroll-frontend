@@ -2,14 +2,8 @@ import { SideBarMenuXfile } from "@/components/ui/SideBarMenuXfile";
 import React, { useEffect, useState } from "react";
 import ProfileIcon from "@/components/ui/ProfileIcon.jpg";
 import { Link } from "react-router-dom";
-import { GofileVideo } from "@/lib/types";
-
-export type WatchComment = {
-  id: string;
-  user: { id: string; name: string; avatarUrl?: string };
-  content: string;
-  createdAt: string; // human readable
-};
+import { GofileVideo, GofileVideoComment } from "@/lib/types";
+import { appUrl } from "@/config/url";
 
 export interface GofileWatchPresenterProps {
   item?: GofileVideo;
@@ -18,12 +12,15 @@ export interface GofileWatchPresenterProps {
   videoRef?: React.RefObject<HTMLVideoElement>;
 
   onLoadMoreComments?: () => void;
-  comments?: WatchComment[];
   hasMoreComments?: boolean;
 
   updateVideo: (next: GofileVideo) => Promise<void> | void;
   likeVideo: (videoId: string | undefined) => Promise<void> | void;
   unlikeVideo: (videoId: string | undefined) => Promise<void> | void;
+
+  commentText: string;
+  setCommentText: (text: string) => void;
+  onSubmitComment: (text: string) => Promise<void> | void;
 }
 
 export const GofileWatchPresenter: React.FC<GofileWatchPresenterProps> = ({
@@ -32,11 +29,13 @@ export const GofileWatchPresenter: React.FC<GofileWatchPresenterProps> = ({
   error,
   videoRef,
   onLoadMoreComments,
-  comments = [],
   hasMoreComments = false,
   updateVideo,
   likeVideo,
   unlikeVideo,
+  commentText,
+  setCommentText,
+  onSubmitComment,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(item?.Name ?? "");
@@ -284,6 +283,7 @@ export const GofileWatchPresenter: React.FC<GofileWatchPresenterProps> = ({
         )}
 
         {/* Comments */}
+        {/* Comments */}
         <section className="mt-7 sm:mt-8">
           <h2 className="mb-2 text-xs font-semibold text-zinc-300 sm:mb-3 sm:text-sm">
             コメント
@@ -294,46 +294,69 @@ export const GofileWatchPresenter: React.FC<GofileWatchPresenterProps> = ({
               className="w-full resize-none rounded-md border border-white/10 bg-white/5 p-2 text-sm text-zinc-100 placeholder:text-zinc-400 focus:border-blue-500 focus:outline-none"
               rows={3}
               placeholder="コメントを書く..."
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
             />
+            <div className="mt-2 flex justify-end">
+              <button
+                onClick={() => {
+                  if (!commentText.trim()) return;
+                  onSubmitComment(commentText.trim());
+                  setCommentText("");
+                }}
+                disabled={!commentText.trim()}
+                className="rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2 text-sm font-semibold text-black shadow-[0_5px_20px_-5px_rgba(245,158,11,0.6)] transition
+             hover:from-amber-400 hover:to-orange-400
+             disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                投稿
+              </button>
+            </div>
           </div>
 
-          {comments.length === 0 ? (
+          {/* コメント一覧（枠・仕切りなし、縦余白だけ） */}
+          {item?.GofileVideoComments.length === 0 ? (
             <div className="mt-2 rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm text-zinc-400">
               まだコメントはありません。
             </div>
           ) : (
-            <ul className="mt-3 space-y-3">
-              {comments.map((c) => (
-                <li
-                  key={c.id}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 sm:p-4"
-                >
-                  <div className="mb-2 flex items-center gap-2">
-                    <div className="h-6 w-6 shrink-0 overflow-hidden rounded-full bg-white/10">
-                      {c.user.avatarUrl ? (
-                        <img
-                          src={c.user.avatarUrl}
-                          alt={c.user.name}
-                          className="h-full w-full object-cover"
-                          onError={(e) => {
-                            (
-                              e.currentTarget as HTMLImageElement
-                            ).style.display = "none";
-                          }}
-                        />
-                      ) : null}
-                    </div>
-                    <div className="min-w-0 text-[11px] text-zinc-400 sm:text-xs">
-                      <span className="truncate text-zinc-200">
-                        {c.user.name}
+            <ul className="mt-3 space-y-4 sm:space-y-5">
+              {item?.GofileVideoComments.map((c) => (
+                <li key={c.ID} className="flex gap-3 sm:gap-4">
+                  {/* Avatar */}
+                  <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-white/10 sm:h-9 sm:w-9">
+                    <a
+                      href={`${appUrl.gofileUser}?id=${c.UserID}`}
+                      className="flex items-center gap-2"
+                    >
+                      <img
+                        src={ProfileIcon}
+                        alt={c.User.name}
+                        className="h-full w-full object-cover"
+                      />
+                    </a>
+                  </div>
+
+                  {/* 本文 */}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2 text-[12px] text-zinc-400 sm:text-[13px]">
+                      <span className="truncate font-medium text-zinc-200">
+                        {c.User.name}
                       </span>
-                      <span className="mx-1">•</span>
-                      <span className="truncate">{c.createdAt}</span>
+                      <span className="opacity-50">•</span>
+                      <span className="truncate">{c.CreatedAt}</span>
+                    </div>
+
+                    <p className="mt-1 whitespace-pre-wrap text-[14px] leading-relaxed text-zinc-100 sm:text-[15px]">
+                      {c.Comment}
+                    </p>
+
+                    {/* いいね/返信 などアクション置きたい場合（オプション） */}
+                    <div className="mt-1.5 flex gap-3 text-xs text-zinc-400">
+                      <button className="hover:text-zinc-200">高く評価</button>
+                      <button className="hover:text-zinc-200">返信</button>
                     </div>
                   </div>
-                  <p className="whitespace-pre-wrap text-sm text-zinc-100">
-                    {c.content}
-                  </p>
                 </li>
               ))}
             </ul>

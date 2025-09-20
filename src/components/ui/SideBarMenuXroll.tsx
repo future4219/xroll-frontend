@@ -120,12 +120,18 @@ export function SideBarMenuXroll() {
                 <li>
                   <a
                     href="/gofile"
-                    className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
+                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-700"
                   >
                     <FaFileAlt className="text-white" size={25} />
-                    <span className="text-white">Gofile</span>
+                    <span className="ml-3 flex items-center gap-4 text-white">
+                      Gofile
+                      <span className="rounded-full bg-yellow-600 px-2 py-0.5 text-xs text-white">
+                        NEW
+                      </span>
+                    </span>
                   </a>
                 </li>
+
                 <li>
                   <a
                     href="/policy"

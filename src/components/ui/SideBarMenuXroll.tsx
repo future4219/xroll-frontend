@@ -117,7 +117,7 @@ export function SideBarMenuXroll() {
                     <span className="text-white">動画保存</span>
                   </a>
                 </li>
-                <li>
+                {/* <li>
                   <a
                     href="/gofile"
                     className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
@@ -125,7 +125,7 @@ export function SideBarMenuXroll() {
                     <FaFileAlt className="text-white" size={25} />
                     <span className="text-white">Gofile</span>
                   </a>
-                </li>
+                </li> */}
                 <li>
                   <a
                     href="/policy"

@@ -1,7 +1,9 @@
 import { SideBarMenuXfile } from "@/components/ui/SideBarMenuXfile";
+import { User } from "@/lib/types";
 import { Link } from "react-router-dom";
 
 type GofileRegisterPresenterProps = {
+  me: User;
   email: string;
   password: string;
   confirmPassword: string;
@@ -13,6 +15,7 @@ type GofileRegisterPresenterProps = {
 };
 
 export function GofileRegisterPresenter({
+  me,
   email,
   password,
   confirmPassword,
@@ -55,6 +58,14 @@ export function GofileRegisterPresenter({
               Gofile Controller へようこそ
             </p>
           </div>
+          {/* ゲストユーザー案内 */}
+          {
+            <div className="mb-4 rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-center text-sm text-amber-300">
+              現在はゲストユーザーとして利用中です。
+              <br />
+              新規会員登録をして、すべての機能をご利用ください。
+            </div>
+          }
 
           {/* エラーバナー */}
           {error && (

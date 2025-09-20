@@ -1,6 +1,7 @@
 import { GofileRegisterPresenter } from "@/components/features/Gofile/GofileRegister/GofileRegisterPresenter";
 import api from "@/lib/api";
-import { useCallback, useState } from "react";
+import { User, UserRes, adaptUserResToUser, newUser } from "@/lib/types";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // ← 追加
 
 export function GofileRegisterContainer() {
@@ -8,8 +9,26 @@ export function GofileRegisterContainer() {
   const [password, setPasswordState] = useState("");
   const [confirmPassword, setConfirmPasswordState] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [me, setMe] = useState<User>(newUser());
+
+  const USER_ID =
+    typeof window !== "undefined" ? localStorage.getItem("userId") : null;
   const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
+
+  // ログイン済みなら /users/me を取得
+  useEffect(() => {
+    if (!USER_ID) return;
+    (async () => {
+      try {
+        const { data } = await api.get<UserRes>(`${apiUrl}/users/me`);
+        setMe(adaptUserResToUser(data));
+      } catch (e) {
+        console.error("Failed to fetch user info:", e);
+        setMe(newUser());
+      }
+    })();
+  }, []); // USER_ID 変化で再取得したいなら依存に USER_ID を追加
 
   const setEmail = (v: string) => {
     setEmailState(v);
@@ -59,6 +78,7 @@ export function GofileRegisterContainer() {
 
   return (
     <GofileRegisterPresenter
+      me={me}
       email={email}
       password={password}
       confirmPassword={confirmPassword}

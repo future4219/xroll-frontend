@@ -202,7 +202,7 @@ export function SideBarMenuXfile() {
                   />
                   <div className="flex min-w-0 flex-col">
                     <span className="truncate text-xs text-gray-400">
-                      {isLoggedIn ? "ログイン中" : "未ログイン"}
+                      {isLoggedIn ? "ログイン中" : "未ログイン（ゲスト）"}
                     </span>
                     <span className="truncate text-sm font-medium text-white">
                       {me.Name ? me.Name : "Unknown User"}

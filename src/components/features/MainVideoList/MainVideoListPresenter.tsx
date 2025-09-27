@@ -1,6 +1,4 @@
-import {
-  XrollFeaturePopup,
-} from "@/components/ads/GofileControllerPromoPopup";
+import { XrollFeaturePopup } from "@/components/ads/GofileControllerPromoPopup";
 import AdBanner, { AdBanner1097564 } from "@/components/ads/juicyAds";
 import JuicyAdsPopup from "@/components/ads/juicyAdsPopup";
 import { StripcashPrPopup } from "@/components/ads/StripcashPrPopup";
@@ -131,7 +129,7 @@ export function MainVideoListPresenter({
 
   return (
     <div>
-      <PopupManager subtleCloseButton>
+      <PopupManager enableCountdown={false}>
         <AdBanner1097564 />
       </PopupManager>
       <StripcashPrPopup />

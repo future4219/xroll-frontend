@@ -59,7 +59,7 @@ const PopupManager: React.FC<PopupManagerProps> = ({
                   className={`text-xs ${
                     subtleCloseButton
                       ? "h-9 text-black hover:text-gray-600"
-                      : "w-3 bg-gray-400 text-black hover:text-gray-800"
+                      : "w-3 bg-gray-400 cursor-pointer text-black hover:text-gray-800"
                   }`}
                 >
                   ✕

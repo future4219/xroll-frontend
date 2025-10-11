@@ -51,10 +51,11 @@ export function SideBarMenuXroll() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -300, opacity: 0 }}
             transition={{ type: "tween" }}
-            className="fixed left-0 top-0 z-50 h-full w-64 bg-black px-3 shadow-lg "
+            className="fixed left-0 top-0 z-50 flex h-full w-64 flex-col bg-black px-3 shadow-lg"
           >
-            <div>
-              <div className="flex gap-3">
+            {/* 上側：メニュー部分 */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="mt-2 flex gap-3">
                 <button onClick={toggleMenu}>
                   <IoMdMenu className="h-6 w-6 text-white" />
                 </button>
@@ -62,21 +63,12 @@ export function SideBarMenuXroll() {
                   <img
                     src={logo}
                     alt="Xroll Logo"
-                    className=" h-16 max-h-full object-contain"
+                    className="h-16 max-h-full object-contain"
                   />
                 </Link>
               </div>
 
-              <ul className="space-y-3">
-                {/* <li>
-                  <a
-                    href="https://go.rmhfrtnd.com?userId=3a43ec976d7f513c2bd3e3019041edf8c12c016056dc22074d25c7907abb93fc"
-                    className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
-                  >
-                    <MdLiveTv className="text-white" size={30} />
-                    <span className="text-white">ライブチャット</span>
-                  </a>
-                </li> */}
+              <ul className="mt-2 space-y-3">
                 <li>
                   <a
                     href={appUrl.gofileSearch}
@@ -91,11 +83,10 @@ export function SideBarMenuXroll() {
                     </span>
                   </a>
                 </li>
-
                 <li>
                   <a
                     href="/"
-                    className="flex items-center gap-2 space-x-2 rounded p-2  hover:bg-gray-700"
+                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-700"
                   >
                     <IoMdHome className="text-white" size={30} />
                     <div className="text-white">おすすめ</div>
@@ -104,7 +95,7 @@ export function SideBarMenuXroll() {
                 <li>
                   <a
                     href="/like-video-list"
-                    className="flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
+                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-700"
                   >
                     <IoIosHeart className="text-white" size={30} />
                     <span className="text-white">いいねした動画</span>
@@ -113,7 +104,7 @@ export function SideBarMenuXroll() {
                 <li>
                   <a
                     href="/realtime-video-list"
-                    className="flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
+                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-700"
                   >
                     <IoMdTime className="text-white" size={30} />
                     <span className="text-white">リアルタイム</span>
@@ -122,41 +113,26 @@ export function SideBarMenuXroll() {
                 <li>
                   <a
                     href="/twitter-video-save"
-                    className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
+                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-700"
                   >
                     <IoMdSave className="text-white" size={30} />
                     <span className="text-white">動画保存</span>
                   </a>
                 </li>
-
-                <li>
-                  <a
-                    href="/policy"
-                    className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
-                  >
-                    <IoIosBook className="text-white" size={30} />
-                    <span className="text-white">規約・免責事項・ポリシー</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/dmca"
-                    className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
-                  >
-                    <IoIosBook className="text-white" size={30} />
-                    <span className="text-white">DMCA</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/usc2257"
-                    className=" flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
-                  >
-                    <IoIosBook className="text-white" size={30} />
-                    <span className="text-white">18 USC 2257 Statement</span>
-                  </a>
-                </li>
               </ul>
+            </div>
+
+            {/* 下側：フッター部分 */}
+            <div className="mb-4 flex items-center justify-center gap-4 text-xs text-gray-400">
+              <a href="/policy" className="hover:text-white">
+                Policy
+              </a>
+              <a href="/dmca" className="hover:text-white">
+                DMCA
+              </a>
+              <a href="/usc2257" className="hover:text-white">
+                2257
+              </a>
             </div>
           </motion.aside>
         )}

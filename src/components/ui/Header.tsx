@@ -36,7 +36,7 @@ export function Header({
     : isRealtimeVideoList
     ? appUrl.realtimeVideoListWithView
     : null;
-  
+
   return (
     <header
       className={`fixed top-0 left-0 z-50 w-full text-white ${
@@ -47,7 +47,7 @@ export function Header({
         {/* 左：ロゴとメニュー */}
         <div className="flex items-center ">
           <SideBarMenuXroll />
-          <div className="ml-2 ">{pageName}</div>
+          <div className="ml-2 font-bold">{pageName}</div>
         </div>
 
         {/* 中央：リール / サムネイル切り替え */}

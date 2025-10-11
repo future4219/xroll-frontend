@@ -1,7 +1,9 @@
 import InterstitialAd from "@/components/ads/InterstitialAd";
+import { AdBanner1097564 } from "@/components/ads/juicyAds";
 import JuicyAdsPopup from "@/components/ads/juicyAdsPopup";
 import VideoItem from "@/components/features/MainVideoList/VideoItem";
 import { Header } from "@/components/ui/Header";
+import PopupManager from "@/components/ui/PopupManager";
 import { Video } from "@/entities/video/entity";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
@@ -56,7 +58,9 @@ export function LikeVideoListPresenter({
 
   return (
     <div className="bg-black">
-      <JuicyAdsPopup />
+      <PopupManager enableCountdown={false}>
+        <AdBanner1097564 />
+      </PopupManager>
       {isVideoModalOpen ? (
         <div className="relative">
           <Header />
@@ -118,12 +122,16 @@ export function LikeVideoListPresenter({
           </div>
 
           {likeVideos.length === 0 && (
-            <>
-              <div className="flex h-screen items-center justify-center font-bold text-white">
+            <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12 text-center text-white">
+              <p className="text-lg font-semibold sm:text-xl">
                 いいねした動画はありません。
-                （ブラウザのプライベートモードをお使いの場合、再度Xrollを訪れたときいいねした動画は保存されていません）
-              </div>
-            </>
+              </p>
+              <p className="mt-3 max-w-md text-sm text-gray-300 sm:text-base">
+                （ブラウザのプライベートモードをお使いの場合、
+                <br className="sm:hidden" />
+                再度Xrollを訪れたときにいいねした動画は保存されていません）
+              </p>
+            </div>
           )}
         </div>
       )}

@@ -77,14 +77,14 @@ export function SideBarMenuXroll() {
                 </li> */}
                 <li>
                   <a
-                    href="https://go.rmhfrtnd.com?userId=3a43ec976d7f513c2bd3e3019041edf8c12c016056dc22074d25c7907abb93fc"
+                    href="/gofile"
                     className="flex items-center gap-2 rounded p-2 hover:bg-gray-700"
                   >
-                    <MdLiveTv className="text-white" size={30} />
-                    <span className="flex items-center gap-1 whitespace-nowrap text-sm text-white">
-                      ライブチャット
+                    <FaFileAlt className="text-yellow-400" size={25} />
+                    <span className="ml-3 flex items-center gap-4 text-yellow-400 text-white">
+                      みんなの動画
                       <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs text-white">
-                        セール中
+                        NEW
                       </span>
                     </span>
                   </a>
@@ -115,20 +115,6 @@ export function SideBarMenuXroll() {
                   >
                     <IoMdSave className="text-white" size={30} />
                     <span className="text-white">動画保存</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/gofile"
-                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-700"
-                  >
-                    <FaFileAlt className="text-white" size={25} />
-                    <span className="ml-3 flex items-center gap-4 text-white">
-                      Gofile
-                      <span className="rounded-full bg-yellow-600 px-2 py-0.5 text-xs text-white">
-                        NEW
-                      </span>
-                    </span>
                   </a>
                 </li>
 

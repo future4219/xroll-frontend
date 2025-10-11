@@ -1,17 +1,20 @@
 import { SideBarMenuXroll } from "@/components/ui/SideBarMenuXroll";
 import logo from "@/components/ui/xroll.png";
 import { appUrl } from "@/config/url";
+import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 type Props = {
   bgColor?: string;
   isMainVideoList?: boolean;
+  isRealtimeVideoList?: boolean;
   showAsReels?: string;
 };
 
 export function Header({
   bgColor,
   isMainVideoList = false,
+  isRealtimeVideoList = false,
   showAsReels,
 }: Props) {
   const location = useLocation();
@@ -22,8 +25,13 @@ export function Header({
   }
   const isVideoList: boolean =
     location.pathname === appUrl.likeVideoList ||
-    location.pathname === appUrl.mainVideoList;
+    location.pathname === appUrl.mainVideoList ||
+    location.pathname === appUrl.realtimeVideoList;
 
+  useEffect(() => {
+    console.log("isMainVideoList", isMainVideoList);
+    console.log("isRealtimeVideoList", isRealtimeVideoList);
+  }, [isMainVideoList, isRealtimeVideoList]);
   return (
     <header
       className={`fixed top-0 left-0 z-50 w-full text-white ${
@@ -56,6 +64,26 @@ export function Header({
             </Link>
             <Link
               to={appUrl.mainVideoListWithView("thumbs")}
+              className={`pb-1 transition ${
+                view == "thumbs" ? "border-b-2 border-white" : "text-gray-300"
+              }`}
+            >
+              サムネイル
+            </Link>
+          </div>
+        )}
+        {isRealtimeVideoList && (
+          <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 space-x-8  font-medium">
+            <Link
+              to={appUrl.realtimeVideoListWithView("reels")}
+              className={`pb-1 transition ${
+                view == "reels" ? "border-b-2 border-white" : "text-gray-300"
+              }`}
+            >
+              リール
+            </Link>
+            <Link
+              to={appUrl.realtimeVideoListWithView("thumbs")}
               className={`pb-1 transition ${
                 view == "thumbs" ? "border-b-2 border-white" : "text-gray-300"
               }`}

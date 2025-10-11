@@ -3,7 +3,7 @@ import { Video } from "@/entities/video/entity";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 
-export function MainVideoListContainer() {
+export function RealtimeVideoListContainer() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [offset, setOffset] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +19,7 @@ export function MainVideoListContainer() {
     try {
       setIsLoading(true);
       const response = await axios.get(`${apiUrl}/videos/search`, {
-        params: { offset: currentOffset, limit },
+        params: { offset: currentOffset, limit, is_realtime: true },
       });
 
       setVideos((prev) => [...prev, ...response.data.videos]);
@@ -47,7 +47,7 @@ export function MainVideoListContainer() {
     }
 
     try {
-       await axios.post(`${apiUrl}/videos/like/${id}`);
+      await axios.post(`${apiUrl}/videos/like/${id}`);
       localStorage.setItem(`liked_${id}`, "true");
     } catch (error) {
       console.error("APIエラー:", error);
@@ -97,8 +97,8 @@ export function MainVideoListContainer() {
       loadMore={loadMore}
       likeVideo={likeVideo}
       commentVideo={commentVideo}
-      isMainVideoList={true}
-      isRealtimeVideoList={false} 
+      isRealtimeVideoList={true}
+      isMainVideoList={false}
     />
   );
 }

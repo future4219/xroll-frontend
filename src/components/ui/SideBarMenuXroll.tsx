@@ -6,6 +6,7 @@ import {
   IoMdHome,
   IoMdMenu,
   IoMdSave,
+  IoMdTime,
 } from "react-icons/io";
 import { FaFileAlt } from "react-icons/fa";
 import { MdLiveTv } from "react-icons/md";
@@ -107,6 +108,15 @@ export function SideBarMenuXroll() {
                   >
                     <IoIosHeart className="text-white" size={30} />
                     <span className="text-white">いいねした動画</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/realtime-video-list"
+                    className="flex items-center gap-2 space-x-2 rounded p-2 hover:bg-gray-700"
+                  >
+                    <IoMdTime className="text-white" size={30} />
+                    <span className="text-white">リアルタイム</span>
                   </a>
                 </li>
                 <li>

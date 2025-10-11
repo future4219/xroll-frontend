@@ -7,6 +7,7 @@ import VideoItem from "@/components/features/MainVideoList/VideoItem";
 import { Header } from "@/components/ui/Header";
 import PopupManager from "@/components/ui/PopupManager";
 import { Video } from "@/entities/video/entity";
+import { is } from "date-fns/locale";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { useLocation } from "react-router-dom";
@@ -17,6 +18,8 @@ interface MainVideoListPresenterProps {
   loadMore: () => void;
   likeVideo: (id: number) => void;
   commentVideo: (id: number, comment: string) => void;
+  isMainVideoList?: boolean;
+  isRealtimeVideoList?: boolean;
 }
 
 export function MainVideoListPresenter({
@@ -25,6 +28,8 @@ export function MainVideoListPresenter({
   loadMore,
   likeVideo,
   commentVideo,
+  isMainVideoList = false,
+  isRealtimeVideoList = false,
 }: MainVideoListPresenterProps) {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -126,6 +131,12 @@ export function MainVideoListPresenter({
       loadMore();
     }
   }, [activeIndex, videos.length, loadMore, view]);
+  //
+
+  // useEffect(() => {
+  //   console.log("isMainVideoList", isMainVideoList);
+  //   console.log("isRealtimeVideoList", isRealtimeVideoList);
+  // }, [isMainVideoList, isRealtimeVideoList]);
 
   return (
     <div>
@@ -135,7 +146,10 @@ export function MainVideoListPresenter({
       <StripcashPrPopup />
       <UpdateNoticePopup />
       <XrollFeaturePopup />
-      <Header isMainVideoList />
+      <Header
+        isRealtimeVideoList={isRealtimeVideoList}
+        isMainVideoList={isMainVideoList}
+      />
 
       {view === "reels" && (
         <div
@@ -173,7 +187,10 @@ export function MainVideoListPresenter({
         <div className="bg-black">
           {isVideoModalOpen ? (
             <div className="relative">
-              <Header isMainVideoList />
+              <Header
+                isMainVideoList={isMainVideoList}
+                isRealtimeVideoList={isRealtimeVideoList}
+              />
               <button
                 onClick={() => setIsVideoModalOpen(false)}
                 className="absolute top-16 z-50 flex rounded px-2 py-1 font-bold text-white focus:outline-none"
@@ -198,7 +215,10 @@ export function MainVideoListPresenter({
             </div>
           ) : (
             <div className="relative">
-              <Header isMainVideoList />
+              <Header
+                isMainVideoList={isMainVideoList}
+                isRealtimeVideoList={isRealtimeVideoList}
+              />
               <div className="grid grid-cols-3 gap-[2px] bg-black sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {videos.map((video) => (
                   <div
@@ -225,7 +245,9 @@ export function MainVideoListPresenter({
               )}
               {videos.length === 0 && (
                 <div className="flex h-screen items-center justify-center font-bold text-white">
-                  おすすめの動画はありません（メンテナンス中です。申し訳ありませんが、しばらくお待ちください）
+                  {`${
+                    isMainVideoList ? "おすすめ" : "リアルタイム"
+                  }の動画はありません（メンテナンス中です。申し訳ありませんが、しばらくお待ちください）`}
                 </div>
               )}
             </div>

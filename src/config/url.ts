@@ -2,6 +2,7 @@ export const appUrl = {
   employeeList: "/employees",
   mainVideoList: "/",
   likeVideoList: "/like-video-list",
+  realtimeVideoList: "/realtime-video-list",
   policy: "/policy",
   twitterVideoSave: "/twitter-video-save",
   dmca: "/dmca",
@@ -19,4 +20,6 @@ export const appUrl = {
 
   // 動的にクエリ付きURLを返す関数
   mainVideoListWithView: (view: "reels" | "thumbs") => `/?view=${view}`,
+  realtimeVideoListWithView: (view: "reels" | "thumbs") =>
+    `/realtime-video-list?view=${view}`,
 } as const;

@@ -17,6 +17,7 @@ import { USC2257 } from "@/components/pages/USC2257";
 import { appUrl } from "@/config/url";
 import { GofileRegister } from "@/components/pages/GofileRegister";
 import { GofileVerify } from "@/components/pages/GofileVerify";
+import { RealtimeVideoList } from "./components/pages/RealtimeVideoList";
 
 function App() {
   return (
@@ -27,6 +28,10 @@ function App() {
       <Routes>
         <Route path={appUrl.mainVideoList} element={<MainVideoList />} />
         <Route path={appUrl.likeVideoList} element={<LikeVideoList />} />
+        <Route
+          path={appUrl.realtimeVideoList}
+          element={<RealtimeVideoList />}
+        />
         <Route path={appUrl.policy} element={<Policy />} />
         <Route path={appUrl.twitterVideoSave} element={<TwitterVideoSave />} />
         <Route path={appUrl.dmca} element={<DMCA />} />
@@ -36,7 +41,7 @@ function App() {
         <Route path={appUrl.gofileLogin} element={<GofileLogin />} />
         <Route path={appUrl.gofileRegister} element={<GofileRegister />} />
         <Route path={appUrl.gofileVerify} element={<GofileVerify />} />
-        
+
         <Route path={appUrl.gofileVault} element={<GofileVault />} />
         <Route path={appUrl.gofileSearch} element={<GofileSearch />} />
         <Route path={appUrl.gofileWatch} element={<GofileWatch />} />

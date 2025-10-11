@@ -47,7 +47,7 @@ export function Header({
         {/* 左：ロゴとメニュー */}
         <div className="flex items-center ">
           <SideBarMenuXroll />
-          <div className="ml-2 font-bold">{pageName}</div>
+          <div className="text-sm font-bold">{pageName}</div>
         </div>
 
         {/* 中央：リール / サムネイル切り替え */}

@@ -12,6 +12,7 @@ import { MdLiveTv } from "react-icons/md";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { appUrl } from "@/config/url";
 
 export function SideBarMenuXroll() {
   const [isOpen, setIsOpen] = useState(false);
@@ -77,7 +78,7 @@ export function SideBarMenuXroll() {
                 </li> */}
                 <li>
                   <a
-                    href="/gofile"
+                    href={appUrl.gofileSearch}
                     className="flex items-center gap-2 rounded p-2 hover:bg-gray-700"
                   >
                     <FaFileAlt className="text-yellow-400" size={25} />

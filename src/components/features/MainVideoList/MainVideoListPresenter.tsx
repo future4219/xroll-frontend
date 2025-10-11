@@ -225,7 +225,7 @@ export function MainVideoListPresenter({
               )}
               {videos.length === 0 && (
                 <div className="flex h-screen items-center justify-center font-bold text-white">
-                  いいねした動画はありません
+                  おすすめの動画はありません（メンテナンス中です。申し訳ありませんが、しばらくお待ちください）
                 </div>
               )}
             </div>

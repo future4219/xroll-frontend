@@ -6,7 +6,7 @@ export function XrollFeaturePopup() {
 
   // 表示期間
   const start = useMemo(() => new Date("2025-09-27T00:00:00+09:00"), []);
-  const end = useMemo(() => new Date("2025-10-07T23:59:59+09:00"), []);
+  const end = useMemo(() => new Date("2025-10-30T23:59:59+09:00"), []);
   const now = new Date();
 
   if (now < start || now > end) return null;
@@ -22,7 +22,7 @@ export function XrollFeaturePopup() {
   }, []);
 
   const handleClick = () => {
-    window.location.href = "/gofile/search"; // 内部リンク or LPに差し替え
+    window.location.href = "/gofile/vault"; // 内部リンク or LPに差し替え
   };
 
   const handleClose = () => {

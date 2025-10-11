@@ -118,9 +118,12 @@ export function LikeVideoListPresenter({
           </div>
 
           {likeVideos.length === 0 && (
-            <div className="flex h-screen items-center justify-center font-bold text-white">
-              いいねした動画はありません
-            </div>
+            <>
+              <div className="flex h-screen items-center justify-center font-bold text-white">
+                いいねした動画はありません。
+                （ブラウザのプライベートモードをお使いの場合、再度Xrollを訪れたときいいねした動画は保存されていません）
+              </div>
+            </>
           )}
         </div>
       )}

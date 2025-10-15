@@ -84,6 +84,14 @@ export type GofileVideo = {
   UpdatedAt: string; // "2006-01-02 15:04:05"
 };
 
+export type GofileVideoView = GofileVideo & {
+  __tempUploading?: boolean; // UI専用: 一時アイテム
+  __uploadTaskId?: string; // UI専用
+  __uploadStatus?: "queued" | "uploading" | "paused" | "error" | "done";
+  __uploadProgress?: number; // 0-100
+  __uploadError?: string | null;
+};
+
 export function GofileVideoResToGofileVideo(v: GofileVideoRes): GofileVideo {
   return {
     Id: v.id,

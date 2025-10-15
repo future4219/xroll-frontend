@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import type {
   GofileCreateRes,
   GofileVideoListRes,
@@ -7,6 +7,7 @@ import type {
   GofileVideo,
   Visibility,
   GofileUpdateReq,
+  GofileVideoView,
 } from "@/lib/types";
 import axios from "axios";
 import { GofileVaultPresenter } from "@/components/features/Gofile/GofileVault/GofileVaultPresenter";
@@ -187,33 +188,79 @@ export function GofileVaultContainer() {
   }, []);
 
   // フィルタリング（Presenter に渡す最終 items）
-  const items = useMemo(() => {
-    let all = [...rawItems].sort(
-      (a, b) => +new Date(b.CreatedAt!) - +new Date(a.CreatedAt!),
-    );
+  // 置き換え（useMemo 部分）
+  const items = useMemo<GofileVideoView[]>(() => {
+    // API 由来（実アイテム）
+    const base: GofileVideoView[] = [...rawItems]
+      .sort((a, b) => +new Date(b.CreatedAt!) - +new Date(a.CreatedAt!))
+      .map((v) => ({ ...v })); // as GofileVideoView でもOK
 
+    // 進行中タスク → 仮アイテム化（done は除外。error は残す／消すは好みで）
+    const tempFromQueue: GofileVideoView[] = queue
+      .filter((t) => t.status !== "done")
+      .map((t) => ({
+        Id: t.id, // 一意キーは task.id（サーバIDではない）
+        Name: t.name,
+        GofileId: "",
+        GofileDirectUrl: null,
+        VideoUrl: null,
+        ThumbnailUrl: null,
+        Description: null,
+        PlayCount: 0,
+        LikeCount: 0,
+        IsShared: false,
+        GofileTags: [],
+        GofileVideoComments: [],
+        UserId: USER_ID || "",
+        User: { Id: USER_ID || "" },
+        HasLike: false,
+        CreatedAt: new Date().toISOString(),
+        UpdatedAt: new Date().toISOString(),
+        // ▼ UI専用
+        __tempUploading: true,
+        __uploadTaskId: t.id,
+        __uploadStatus: t.status,
+        __uploadProgress: t.progress ?? 0,
+        __uploadError: t.error ?? null,
+        size: t.file?.size,
+        // previewUrl: t.previewUrl, // 使うなら UploadTask に追加して渡す
+      }));
+
+    const merged = [...tempFromQueue, ...base];
+
+    // 検索（タグ名で引っかかるように修正）
     const q = query.trim().toLowerCase();
-    if (!q) return all;
-    return all.filter((i) =>
-      [i.Name, i.GofileTags?.join(" ") || ""]
+    if (!q) return merged;
+    return merged.filter((i) =>
+      [
+        i.Name,
+        ...(Array.isArray(i.GofileTags)
+          ? (i.GofileTags as any[]).map((x) => x?.Name || "")
+          : []),
+      ]
         .join(" ")
         .toLowerCase()
         .includes(q),
     );
-  }, [rawItems, tab, query]);
+  }, [rawItems, queue, query, USER_ID]);
 
-  // 表示トグル（デモ）
-  const onToggleVisibility = (id: string) => {
+  // 置き換え（onToggleVisibility）
+  const onToggleVisibility = async (id: string) => {
+    const item = rawItems.find((it) => it.Id === id);
+    if (!item) return;
+    const next = !item.IsShared;
+
+    // 楽観的更新（UI先行→失敗なら戻す）
     setRawItems((prev) =>
-      prev.map((it) =>
-        it.Id === id
-          ? {
-              ...it,
-              visibility: it.IsShared === false ? "private" : "shared",
-            }
-          : it,
-      ),
+      prev.map((it) => (it.Id === id ? { ...it, IsShared: next } : it)),
     );
+    try {
+      await updateIsShared(item, next);
+    } catch {
+      setRawItems((prev) =>
+        prev.map((it) => (it.Id === id ? { ...it, IsShared: !next } : it)),
+      );
+    }
   };
 
   // アップロードキューに追加
@@ -274,35 +321,202 @@ export function GofileVaultContainer() {
     setQueue((prev) => prev.filter((t) => t.status !== "done"));
   }, [queue]);
 
+  //////////////// Chatgptがかいたが、理解できてない(アップロード中だった動画の復元するための実装) //////////////////////////
+  // UploadTask の status ユニオンを使う
+  type UploadStatus = "queued" | "uploading" | "paused" | "error" | "done";
+
+  // localStorage に保存する軽量版（File, controller は保存しない）
+  type StoredTask = Omit<UploadTask, "file" | "controller" | "status"> & {
+    status: string; // 保存時は string になっている想定
+  };
+
+  // 許可ステータス判定
+  const isStatus = (s: any): s is UploadStatus =>
+    s === "queued" ||
+    s === "uploading" ||
+    s === "paused" ||
+    s === "error" ||
+    s === "done";
+
+  // 文字列を UploadStatus に正規化（不正値は "paused" に寄せる等）
+  const normalizeStatus = (s: string): UploadStatus =>
+    isStatus(s) ? s : "paused";
+
+  // --- 保存 ---
+  const saveQueue = (queue: UploadTask[]) => {
+    const dump: StoredTask[] = queue.map(({ file, controller, ...rest }) => ({
+      ...rest,
+      // status は string で保存されてもOK（復元時に正規化する）
+      status: rest.status,
+    }));
+    localStorage.setItem("xfile.uploadQueue", JSON.stringify(dump));
+  };
+
+  // --- 復元 ---
+  const loadQueue = (): UploadTask[] => {
+    const raw = localStorage.getItem("xfile.uploadQueue");
+    if (!raw) return [];
+    try {
+      const saved = JSON.parse(raw) as StoredTask[];
+      const recovered: UploadTask[] = saved.map((t) => ({
+        ...t,
+        file: undefined,
+        controller: undefined,
+        // "uploading" だったものはページ再読込後は実際には止まっているので "paused" に寄せる
+        status:
+          normalizeStatus(t.status) === "uploading"
+            ? ("paused" as const)
+            : normalizeStatus(t.status),
+        // 進捗・エラーはそのまま
+        progress: typeof t.progress === "number" ? t.progress : 0,
+      }));
+      return recovered;
+    } catch {
+      return [];
+    }
+  };
+
+  // 復元（初回マウント時）
+  useEffect(() => {
+    const recovered = loadQueue();
+    if (recovered.length) setQueue(recovered); // ← 型OK（UploadTask[]）
+  }, []);
+
+  // 変更のたび保存
+  useEffect(() => {
+    saveQueue(queue);
+  }, [queue]);
+
+  const pauseTask = (taskId: string) => {
+    setQueue((prev) =>
+      prev.map((t) => {
+        if (t.id !== taskId) return t;
+        try {
+          t.controller?.abort();
+        } catch {}
+        return { ...t, controller: undefined, status: "paused" as const };
+      }),
+    );
+  };
+
+  const resumeTask = (taskId: string, file?: File) => {
+    const t = queue.find((x) => x.id === taskId);
+    if (!t) return;
+
+    // リロード後など file が無い場合は再選択が必要
+    const useFile = file ?? t.file;
+    if (!useFile) {
+      // ここでは「ファイル選択を促す」UIへ委譲（下の 3) を参照）
+      // 例: setPendingResumeTaskId(taskId); openFilePicker();
+      return;
+    }
+
+    const controller = new AbortController();
+    setQueue((prev) =>
+      prev.map((x) =>
+        x.id === taskId
+          ? { ...x, controller, file: useFile, status: "uploading" }
+          : x,
+      ),
+    );
+    console.log("Resuming upload for task:", taskId);
+
+    // 既存の uploadOne を再利用
+    uploadOne(taskId, useFile, controller);
+  };
+
+  // 全部再開（file があるものだけ）
+  const resumeAll = () => {
+    queue
+      .filter((t) => t.status === "paused" && t.file)
+      .forEach((t) => resumeTask(t.id));
+  };
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [pendingResumeTaskId, setPendingResumeTaskId] = useState<string | null>(
+    null,
+  );
+
+  const askFileAndResume = (taskId: string) => {
+    setPendingResumeTaskId(taskId);
+    fileInputRef.current?.click();
+  };
+
+  const onPickResumeFile: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    const f = e.target.files?.[0];
+    e.target.value = ""; // 次回も同名でトリガーできるようクリア
+    if (!f || !pendingResumeTaskId) return;
+
+    // （任意）名前やサイズでのざっくり検証
+    const t = queue.find((q) => q.id === pendingResumeTaskId);
+    if (t && t.size && f.size !== t.size) {
+      alert(
+        "ファイルサイズが元のタスクと異なります。正しいファイルを選んでください。",
+      );
+      return;
+    }
+    resumeTask(pendingResumeTaskId, f);
+    setPendingResumeTaskId(null);
+  };
+
+  const cancelTask = (taskId: string) => {
+    setQueue((prev) => {
+      const t = prev.find((x) => x.id === taskId);
+      try {
+        t?.controller?.abort();
+      } catch {}
+      return prev.filter((x) => x.id !== taskId);
+    });
+  };
+
+  ////////////////////////////////////////////////////////
+
   return (
-    <GofileVaultPresenter
-      items={items}
-      query={query}
-      onQueryChange={setQuery}
-      tab={tab}
-      onTabChange={setTab}
-      view={view}
-      onViewChange={setView}
-      uploadOpen={uploadOpen}
-      onUploadOpen={() => setUploadOpen(true)}
-      onUploadClose={() => setUploadOpen(false)}
-      queue={queue}
-      setQueue={setQueue}
-      onAddFiles={onAddFiles}
-      shareFor={shareFor}
-      onOpenShare={(it) => setShareFor(it)}
-      onCloseShare={() => setShareFor(null)}
-      onPatchShare={(patch) =>
-        setRawItems((prev) =>
-          prev.map((i) =>
-            shareFor && i.Id === shareFor.Id ? { ...i, ...patch } : i,
-          ),
-        )
-      }
-      onToggleVisibility={onToggleVisibility}
-      updateIsShared={updateIsShared}
-      deleteVideo={deleteVideo}
-    />
+    <>
+      <GofileVaultPresenter
+        items={items}
+        query={query}
+        onQueryChange={setQuery}
+        tab={tab}
+        onTabChange={setTab}
+        view={view}
+        onViewChange={setView}
+        uploadOpen={uploadOpen}
+        onUploadOpen={() => setUploadOpen(true)}
+        onUploadClose={() => setUploadOpen(false)}
+        queue={queue}
+        setQueue={setQueue}
+        onAddFiles={onAddFiles}
+        shareFor={shareFor}
+        onOpenShare={(it) => setShareFor(it)}
+        onCloseShare={() => setShareFor(null)}
+        onPatchShare={(patch) =>
+          setRawItems((prev) =>
+            prev.map((i) =>
+              shareFor && i.Id === shareFor.Id ? { ...i, ...patch } : i,
+            ),
+          )
+        }
+        onToggleVisibility={onToggleVisibility}
+        updateIsShared={updateIsShared}
+        deleteVideo={deleteVideo}
+        onResumeTask={(id) => {
+          const t = queue.find((q) => q.id === id);
+          if (t?.file) resumeTask(id);
+          else askFileAndResume(id);
+        }}
+        onPauseTask={pauseTask}
+        onCancelTask={cancelTask} // ← 追加
+      />
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="video/*"
+        className="hidden"
+        onChange={onPickResumeFile}
+      />
+      ;
+    </>
   );
 }
 

@@ -1,18 +1,18 @@
-// GofileVaultPresenter.tsx
-import React from "react";
-import { Search, Upload, AlertTriangle } from "lucide-react";
+// 追加：UI拡張型をimport（共通の場所に定義したもの）
 import { SideBarMenuXfile } from "@/components/ui/SideBarMenuXfile";
-import { UploadBar } from "@/components/features/Gofile/GofileVault/UploadBar";
-import { UploadDialog } from "@/components/features/Gofile/GofileVault/UploadDialog";
-import { ShareDrawer } from "@/components/features/Gofile/GofileVault/ShareDrawer";
-import { VaultGrid } from "@/components/features/Gofile/GofileVault/VaultGrid";
-import { VaultList } from "@/components/features/Gofile/GofileVault/VaultList";
-import { VaultTabs } from "@/components/features/Gofile/GofileVault/VaultTabs";
-import { EmptyState } from "@/components/features/Gofile/GofileVault/EmptyState";
-import type { UploadTask, GofileVideo, Visibility } from "@/lib/types";
+import type { UploadTask, Visibility } from "@/lib/types";
+import type { GofileVideoView } from "@/lib/types"; // ← 例：拡張型の置き場
+import { Search, Upload, AlertTriangle } from "lucide-react";
+import React from "react";
+import { EmptyState } from "./EmptyState";
+import { ShareDrawer } from "./ShareDrawer";
+import { UploadDialog } from "./UploadDialog";
+import { VaultGrid } from "./VaultGrid";
+import { VaultList } from "./VaultList";
+import { VaultTabs } from "./VaultTabs";
 
 export interface GofileVaultPresenterProps {
-  items: GofileVideo[];
+  items: GofileVideoView[]; // ← 変更
   query: string;
   onQueryChange: (v: string) => void;
   tab: Visibility | "recent";
@@ -27,13 +27,16 @@ export interface GofileVaultPresenterProps {
   setQueue: React.Dispatch<React.SetStateAction<UploadTask[]>>;
   onAddFiles: (files: File[]) => void;
 
-  shareFor: GofileVideo | null;
-  onOpenShare: (item: GofileVideo) => void;
+  shareFor: GofileVideoView | null; // ← 変更
+  onOpenShare: (item: GofileVideoView) => void; // ← 変更
   onCloseShare: () => void;
-  onPatchShare: (patch: Partial<GofileVideo>) => void;
+  onPatchShare: (patch: Partial<GofileVideoView>) => void; // ← 変更
   onToggleVisibility: (id: string) => void;
-  updateIsShared: (item: GofileVideo, isShared: boolean) => void;
+  updateIsShared: (item: GofileVideoView, isShared: boolean) => void; // ← 変更
   deleteVideo: (videoId: string) => void;
+  onPauseTask: (uploadTaskId: string) => void;
+  onResumeTask: (uploadTaskId: string) => void;
+  onCancelTask: (uploadTaskId: string) => void;
 }
 
 export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
@@ -57,6 +60,9 @@ export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
   onToggleVisibility,
   updateIsShared,
   deleteVideo,
+  onPauseTask,
+  onResumeTask,
+  onCancelTask,
 }) => {
   return (
     <div className="flex min-h-screen flex-col bg-black text-white">
@@ -98,13 +104,12 @@ export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
             </button>
           </div>
         </div>
-        {/* アップロード進捗 */}
-        <UploadBar queue={queue} setQueue={setQueue} />
+
+        {/* アップロード進捗（任意：キューがあるときだけ表示） */}
       </header>
 
       {/* ===== Main ===== */}
       <main className="mx-auto w-full max-w-7xl px-4 pt-24 pb-16">
-        {/* ★ ベータ注意書き（タブの上に表示 / 閉じると今後表示しない） */}
         <BetaNotice />
 
         <VaultTabs
@@ -118,15 +123,18 @@ export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
           <EmptyState onUpload={onUploadOpen} />
         ) : view === "grid" ? (
           <VaultGrid
-            items={items}
+            items={items} // ← そのまま拡張型で渡す
             onShare={onOpenShare}
             onToggleVisibility={onToggleVisibility}
             updateIsShared={updateIsShared}
             deleteVideo={deleteVideo}
+            onPauseTask={onPauseTask}
+            onResumeTask={onResumeTask}
+            onCancelTask={onCancelTask}
           />
         ) : (
           <VaultList
-            items={items}
+            items={items} // ← そのまま拡張型で渡す
             onShare={onOpenShare}
             onToggleVisibility={onToggleVisibility}
           />
@@ -136,7 +144,7 @@ export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
       {/* Mobile FAB */}
       <button
         onClick={onUploadOpen}
-        className="fixed bottom-20 right-4 z-[60] inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-xl sm:hidden"
+        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-4 z-[60] inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-xl sm:hidden"
         aria-label="アップロード"
       >
         <Upload className="h-6 w-6" />
@@ -150,7 +158,7 @@ export const GofileVaultPresenter: React.FC<GofileVaultPresenterProps> = ({
         queue={queue}
       />
       <ShareDrawer
-        item={shareFor}
+        item={shareFor} // ← GofileVideoView | null
         onClose={onCloseShare}
         onUpdate={onPatchShare}
       />

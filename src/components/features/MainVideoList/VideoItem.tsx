@@ -9,6 +9,7 @@ import { FaRegCommentDots } from "react-icons/fa";
 import { IoVolumeHighOutline, IoVolumeMuteOutline } from "react-icons/io5";
 import { MdOutlineSaveAlt } from "react-icons/md";
 import { useInView } from "react-intersection-observer";
+import { root } from "postcss";
 
 interface VideoItemProps {
   setVideos: React.Dispatch<React.SetStateAction<Video[]>>;
@@ -20,6 +21,7 @@ interface VideoItemProps {
   likeVideo: (id: number) => void;
   commentVideo: (id: number, comment: string) => void;
   isAd: boolean;
+  observerRoot?: Element | null;
 }
 
 function VideoItem({
@@ -32,6 +34,7 @@ function VideoItem({
   likeVideo,
   commentVideo,
   isAd,
+  observerRoot,
 }: VideoItemProps) {
   // フックは常に呼ぶ
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -40,12 +43,31 @@ function VideoItem({
   const [isSeeking, setIsSeeking] = useState(false);
   const isSeekingRef = useRef(false);
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
-
   // IntersectionObserver で実際の可視性を取得
   const { ref, inView } = useInView({
     threshold: 0.5,
     triggerOnce: false,
+    root: observerRoot ?? null, // reels/モーダルでは独自スクロールを監視
   });
+
+  const [isPermaSaved, setIsPermaSaved] = useState(false);
+
+  // 初期化：localStorage を見てボタン状態を復元
+  useEffect(() => {
+    setIsPermaSaved(!!localStorage.getItem(`perma-${video.id}`));
+  }, [video.id]);
+
+  // 永久保存ハンドラ（必要ならここでAPI呼び出しに差し替え）
+  const handlePermaSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isPermaSaved) return;
+
+    // TODO: サーバーに保存APIを用意したらここで呼ぶ
+    // await permaSaveVideo(video.id)
+
+    localStorage.setItem(`perma-${video.id}`, new Date().toISOString());
+    setIsPermaSaved(true);
+  };
 
   useEffect(() => {
     isSeekingRef.current = isSeeking;
@@ -212,18 +234,20 @@ function VideoItem({
                 className="absolute bottom-40 right-4 flex flex-col items-center space-y-6 text-white"
                 onClick={(e) => e.stopPropagation()}
               >
-                {video.tweet_url && <button
-                  onClick={handleTwitterIconClick}
-                  className="flex flex-col items-center"
-                >
-                  <div className="flex h-6 w-8 items-center justify-center">
-                    <img
-                      src={TwitterLogo}
-                      alt="Twitter Logo"
-                      className="h-7 w-7 object-contain"
-                    />
-                  </div>
-                </button>}
+                {video.tweet_url && (
+                  <button
+                    onClick={handleTwitterIconClick}
+                    className="flex flex-col items-center"
+                  >
+                    <div className="flex h-6 w-8 items-center justify-center">
+                      <img
+                        src={TwitterLogo}
+                        alt="Twitter Logo"
+                        className="h-7 w-7 object-contain"
+                      />
+                    </div>
+                  </button>
+                )}
 
                 <button
                   onClick={handleLike}
@@ -279,6 +303,30 @@ function VideoItem({
                 commentVideo={commentVideo}
                 setVideos={setVideos}
               />
+              <div
+                className="absolute left-2 bottom-16 z-10 md:bottom-20"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePermaSave(e);
+                    window.location.href = "/gofile/vault";
+                  }}
+                  disabled={isPermaSaved}
+                  className={`rounded-lg border px-4 py-2 text-sm font-semibold shadow-md backdrop-blur-sm transition
+                            ${
+                              isPermaSaved
+                                ? "cursor-default border-emerald-400/40 bg-emerald-500/30 text-emerald-200"
+                                : "bg-white/70 text-black hover:bg-white"
+                            }`}
+                  aria-pressed={isPermaSaved}
+                  aria-label={isPermaSaved ? "永久保存済み" : "永久保存する"}
+                  title={isPermaSaved ? "永久保存済み" : "永久保存する"}
+                >
+                  {isPermaSaved ? "永久保存済み" : "永久保存する"}
+                </button>
+              </div>
             </>
           )}
         </>

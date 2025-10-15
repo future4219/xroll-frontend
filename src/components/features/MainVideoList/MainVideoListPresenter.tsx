@@ -126,17 +126,32 @@ export function MainVideoListPresenter({
     return () => window.removeEventListener("scroll", onScroll);
   }, [view, isFetchingMore, loadMore]);
 
+  // ① 従来の activeIndex 到達トリガー（残す）
   useEffect(() => {
     if (view === "reels" && activeIndex === videos.length - 1) {
       loadMore();
     }
   }, [activeIndex, videos.length, loadMore, view]);
-  //
 
-  // useEffect(() => {
-  //   console.log("isMainVideoList", isMainVideoList);
-  //   console.log("isRealtimeVideoList", isRealtimeVideoList);
-  // }, [isMainVideoList, isRealtimeVideoList]);
+  // ② reels のスクロール量で「底付近」を検知してもフェッチ
+  useEffect(() => {
+    if (view !== "reels") return;
+    const c = containerRef.current;
+    if (!c) return;
+    const THRESHOLD_PX = 200; // 底から200px 以内で発火
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        const nearBottom = c.scrollTop + c.clientHeight >= c.scrollHeight - THRESHOLD_PX;
+        if (nearBottom) loadMore();
+      });
+    };
+    c.addEventListener("scroll", onScroll);
+    return () => c.removeEventListener("scroll", onScroll);
+  }, [view, loadMore]);
 
   return (
     <div>
@@ -176,6 +191,7 @@ export function MainVideoListPresenter({
                   likeVideo={likeVideo}
                   commentVideo={commentVideo}
                   isAd={false}
+                  observerRoot={containerRef.current}
                 />
               );
             })
@@ -210,6 +226,7 @@ export function MainVideoListPresenter({
                   likeVideo={likeVideo}
                   commentVideo={commentVideo}
                   isAd={false}
+                  observerRoot={containerRef.current}
                 />
               </div>
             </div>
@@ -244,10 +261,16 @@ export function MainVideoListPresenter({
                 </div>
               )}
               {videos.length === 0 && (
-                <div className="flex h-screen items-center justify-center font-bold text-white">
-                  {`${
-                    isMainVideoList ? "おすすめ" : "リアルタイム"
-                  }の動画はありません（メンテナンス中です。申し訳ありませんが、しばらくお待ちください）`}
+                <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12 text-center text-white">
+                  <p className="text-lg font-semibold sm:text-xl">
+                    {isMainVideoList ? "おすすめ" : "リアルタイム"}
+                    の動画はありません。
+                  </p>
+                  <p className="mt-3 max-w-md text-sm text-gray-300 sm:text-base">
+                    現在メンテナンス中です。申し訳ありませんが、
+                    <br className="sm:hidden" />
+                    しばらくお待ちください。
+                  </p>
                 </div>
               )}
             </div>

@@ -307,25 +307,27 @@ function VideoItem({
                 className="absolute left-2 bottom-16 z-10 md:bottom-20"
                 onClick={(e) => e.stopPropagation()}
               >
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handlePermaSave(e);
-                    window.location.href = "/gofile/vault";
-                  }}
-                  disabled={isPermaSaved}
-                  className={`rounded-lg border px-4 py-2 text-sm font-semibold shadow-md backdrop-blur-sm transition
+                {false &&
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePermaSave(e);
+                      window.location.href = "/gofile/vault";
+                    }}
+                    disabled={isPermaSaved}
+                    className={`rounded-lg border px-4 py-2 text-sm font-semibold shadow-md backdrop-blur-sm transition
                             ${
                               isPermaSaved
                                 ? "cursor-default border-emerald-400/40 bg-emerald-500/30 text-emerald-200"
                                 : "bg-white/70 text-black hover:bg-white"
                             }`}
-                  aria-pressed={isPermaSaved}
-                  aria-label={isPermaSaved ? "永久保存済み" : "永久保存する"}
-                  title={isPermaSaved ? "永久保存済み" : "永久保存する"}
-                >
-                  {isPermaSaved ? "永久保存済み" : "永久保存する"}
-                </button>
+                    aria-pressed={isPermaSaved}
+                    aria-label={isPermaSaved ? "永久保存済み" : "永久保存する"}
+                    title={isPermaSaved ? "永久保存済み" : "永久保存する"}
+                  >
+                    {isPermaSaved ? "永久保存済み" : "永久保存する"}
+                  </button>
+                }
               </div>
             </>
           )}

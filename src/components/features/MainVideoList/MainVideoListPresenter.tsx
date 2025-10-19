@@ -6,8 +6,8 @@ import { UpdateNoticePopup } from "@/components/ads/UpdateNoticePopup";
 import VideoItem from "@/components/features/MainVideoList/VideoItem";
 import { Header } from "@/components/ui/Header";
 import PopupManager from "@/components/ui/PopupManager";
+import { Spinner } from "@/components/ui/Spinner";
 import { Video } from "@/entities/video/entity";
-import { is } from "date-fns/locale";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { useLocation } from "react-router-dom";
@@ -145,7 +145,8 @@ export function MainVideoListPresenter({
       ticking = true;
       requestAnimationFrame(() => {
         ticking = false;
-        const nearBottom = c.scrollTop + c.clientHeight >= c.scrollHeight - THRESHOLD_PX;
+        const nearBottom =
+          c.scrollTop + c.clientHeight >= c.scrollHeight - THRESHOLD_PX;
         if (nearBottom) loadMore();
       });
     };
@@ -173,9 +174,17 @@ export function MainVideoListPresenter({
           style={{ height: "100dvh" }}
         >
           {videos.length === 0 ? (
-            <div className="flex h-screen flex-col items-center justify-center bg-black px-4">
-              {/* ロード中UI */}
-            </div>
+            <Spinner
+              message={
+                <>
+                  読み込み中です…
+                  <br />
+                  <span className="text-xs text-gray-400">
+                    ※22:00〜24:00の時間帯はアクセス集中により遅くなる場合があります。しばらくお待ち下さい。
+                  </span>
+                </>
+              }
+            />
           ) : (
             videos.map((video, idx) => {
               const shouldRender = Math.abs(idx - activeIndex) <= 30;
@@ -236,31 +245,45 @@ export function MainVideoListPresenter({
                 isMainVideoList={isMainVideoList}
                 isRealtimeVideoList={isRealtimeVideoList}
               />
-              <div className="grid grid-cols-3 gap-[2px] bg-black sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                {videos.map((video) => (
-                  <div
-                    key={video.id}
-                    onClick={() => {
-                      setSavedScrollY(window.scrollY);
-                      setIsVideoModalOpen(true);
-                      setFocusedVideoId(video.id);
-                    }}
-                    className="mb-1 cursor-pointer"
-                  >
-                    <img
-                      src={video.thumbnail_url}
-                      alt="thumbnail"
-                      className="mx-auto aspect-[9/16] w-full object-contain shadow-sm"
-                    />
-                  </div>
-                ))}
-              </div>
-              {isFetchingMore && (
-                <div className="py-4 text-center text-sm text-white">
-                  さらに読み込み中…
+              {videos.length === 0 ? (
+                <Spinner
+                  message={
+                    <>
+                      読み込み中です…
+                      <br />
+                      <span className="text-xs text-gray-400">
+                        ※22:00〜24:00の時間帯はアクセス集中により遅くなる場合があります。しばらくお待ちください。
+                      </span>
+                    </>
+                  }
+                />
+              ) : (
+                <div className="grid grid-cols-3 gap-[2px] bg-black sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                  {videos.map((video) => (
+                    <div
+                      key={video.id}
+                      onClick={() => {
+                        setSavedScrollY(window.scrollY);
+                        setIsVideoModalOpen(true);
+                        setFocusedVideoId(video.id);
+                      }}
+                      className="mb-1 cursor-pointer"
+                    >
+                      <img
+                        src={video.thumbnail_url}
+                        alt="thumbnail"
+                        className="mx-auto aspect-[9/16] w-full object-contain shadow-sm"
+                      />
+                    </div>
+                  ))}
                 </div>
               )}
-              {videos.length === 0 && (
+
+              {isFetchingMore && (
+                // テキストの代わりに小さめスピナー
+                <Spinner message="さらに読み込み中…" size={28} full={false} />
+              )}
+              {/* {videos.length === 0 && (
                 <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12 text-center text-white">
                   <p className="text-lg font-semibold sm:text-xl">
                     {isMainVideoList ? "おすすめ" : "リアルタイム"}
@@ -272,7 +295,7 @@ export function MainVideoListPresenter({
                     しばらくお待ちください。
                   </p>
                 </div>
-              )}
+              )} */}
             </div>
           )}
         </div>

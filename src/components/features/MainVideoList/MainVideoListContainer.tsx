@@ -98,7 +98,7 @@ export function MainVideoListContainer() {
       likeVideo={likeVideo}
       commentVideo={commentVideo}
       isMainVideoList={true}
-      isRealtimeVideoList={false} 
+      isRealtimeVideoList={false}
     />
   );
 }

@@ -56,7 +56,7 @@ export function OfficialTiktokNotice() {
         </ul>
 
         <a
-          href="https://www.tiktok.com/@xroll_developer"
+          href="https://www.tiktok.com/@xroll_official"
           target="_blank"
           className="block w-full rounded-md bg-black py-2 text-center text-white transition hover:bg-gray-800"
         >

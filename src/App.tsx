@@ -23,7 +23,7 @@ function App() {
   return (
     <BrowserRouter>
       {/* ← ここで全ページ共通で一度だけ実行 */}
-      <BootInit />
+      {/* <BootInit /> */}
 
       <Routes>
         <Route path={appUrl.mainVideoList} element={<MainVideoList />} />

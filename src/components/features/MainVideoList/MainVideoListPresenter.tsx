@@ -2,6 +2,7 @@ import { XrollFeaturePopup } from "@/components/ads/GofileControllerPromoPopup";
 import AdBanner, { AdBanner1097564 } from "@/components/ads/juicyAds";
 import JuicyAdsPopup from "@/components/ads/juicyAdsPopup";
 import { OfficialTiktokNotice } from "@/components/ads/OfficialTiktokNotice";
+import { XrollDonatePopup } from "@/components/ads/paypay";
 import { StripcashPrPopup } from "@/components/ads/StripcashPrPopup";
 import { UpdateNoticePopup } from "@/components/ads/UpdateNoticePopup";
 import VideoItem from "@/components/features/MainVideoList/VideoItem";
@@ -164,6 +165,7 @@ export function MainVideoListPresenter({
       <UpdateNoticePopup />
       <XrollFeaturePopup />
       <OfficialTiktokNotice />
+      <XrollDonatePopup />
       <Header
         isRealtimeVideoList={isRealtimeVideoList}
         isMainVideoList={isMainVideoList}

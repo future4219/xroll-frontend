@@ -7,8 +7,8 @@ export function XrollDonatePopup() {
   const PAYPAY_LINK = "https://qr.paypay.ne.jp/p2p01_xv5ERfwKV7GAWANK";
 
   // 表示期間
-  const start = useMemo(() => new Date("2025-12-12T00:00:00+09:00"), []);
-  const end = useMemo(() => new Date("2026-01-31T23:59:59+09:00"), []);
+  const start = useMemo(() => new Date("2025-12-11T00:00:00+09:00"), []);
+  const end = useMemo(() => new Date("2025-12-12T23:27:59+09:00"), []);
   const now = new Date();
 
   if (now < start || now > end) return null;

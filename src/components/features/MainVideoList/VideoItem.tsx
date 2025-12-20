@@ -220,6 +220,9 @@ function VideoItem({
                 preload={isActive ? "auto" : "metadata"}
                 muted={isMuted}
                 controls
+                // @ts-ignore
+                referrerPolicy="no-referrer"
+                crossOrigin="anonymous"
                 onLoadedData={() => {
                   if (isActive && videoRef.current) {
                     setTimeout(() => {
@@ -307,7 +310,7 @@ function VideoItem({
                 className="absolute left-2 bottom-16 z-10 md:bottom-20"
                 onClick={(e) => e.stopPropagation()}
               >
-                {false &&
+                {false && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -327,7 +330,7 @@ function VideoItem({
                   >
                     {isPermaSaved ? "永久保存済み" : "永久保存する"}
                   </button>
-                }
+                )}
               </div>
             </>
           )}

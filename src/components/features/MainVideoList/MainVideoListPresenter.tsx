@@ -4,13 +4,24 @@ import JuicyAdsPopup from "@/components/ads/juicyAdsPopup";
 import { OfficialTiktokNotice } from "@/components/ads/OfficialTiktokNotice";
 import { XrollDonatePopup } from "@/components/ads/paypay";
 import { StripcashPrPopup } from "@/components/ads/StripcashPrPopup";
+import StripchatReelAd, {
+  STRIPCHAT_AD_SRC,
+} from "@/components/ads/StripchatReelAd";
+import { StripchatSpotIframe300x250 } from "@/components/ads/StripchatSpotIframe300x250";
+import { StripchatThumbVideoAdTile } from "@/components/ads/StripchatThumbAdTile";
 import { UpdateNoticePopup } from "@/components/ads/UpdateNoticePopup";
 import VideoItem from "@/components/features/MainVideoList/VideoItem";
 import { Header } from "@/components/ui/Header";
 import PopupManager from "@/components/ui/PopupManager";
 import { Spinner } from "@/components/ui/Spinner";
 import { Video } from "@/entities/video/entity";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { useLocation } from "react-router-dom";
 
@@ -156,10 +167,58 @@ export function MainVideoListPresenter({
     return () => c.removeEventListener("scroll", onScroll);
   }, [view, loadMore]);
 
+  //========== フィードアイテムの構築（動画＋広告の混在）============
+  type FeedItem = { kind: "video"; video: Video } | { kind: "ad"; id: string };
+
+  const AD_EVERY = 6; // 6本ごとに1回
+  const AD_FIRST_AT = 2; // 最初はn本目の後
+
+  function buildFeedItems(videos: Video[]): FeedItem[] {
+    const items: FeedItem[] = [];
+    let adCount = 0;
+
+    videos.forEach((v, i) => {
+      items.push({ kind: "video", video: v });
+
+      const shouldInsertAd =
+        i + 1 === AD_FIRST_AT ||
+        (i + 1 - AD_FIRST_AT > 0 && (i + 1 - AD_FIRST_AT) % AD_EVERY === 0);
+
+      if (shouldInsertAd) {
+        adCount += 1;
+        items.push({ kind: "ad", id: `stripchat-${adCount}` });
+      }
+    });
+
+    return items;
+  }
+
+  const feedItems = React.useMemo(() => buildFeedItems(videos), [videos]);
+  //===========================================================
+
+  //========== サムネイルビュー用アイテム構築（動画＋広告の混在）============
+  type ThumbItem = { kind: "video"; video: Video } | { kind: "ad"; id: string };
+
+  const thumbItems = useMemo<ThumbItem[]>(() => {
+    const out: ThumbItem[] = [];
+    const EVERY = 8;
+
+    videos.forEach((v, i) => {
+      if (i !== 0 && i % EVERY === 0) out.push({ kind: "ad", id: `ad-${i}` });
+      out.push({ kind: "video", video: v });
+    });
+
+    return out;
+  }, [videos]);
+  //====================================================================
+
   return (
     <div>
-      <PopupManager enableCountdown={false}>
+      {/* <PopupManager enableCountdown={false}>
         <AdBanner1097564 />
+      </PopupManager> */}
+      <PopupManager initialDelay={2} enableCountdown={false}>
+        <StripchatSpotIframe300x250 />
       </PopupManager>
       <StripcashPrPopup />
       <UpdateNoticePopup />
@@ -190,8 +249,19 @@ export function MainVideoListPresenter({
               }
             />
           ) : (
-            videos.map((video, idx) => {
-              const shouldRender = Math.abs(idx - activeIndex) <= 30;
+            feedItems.map((item, idx) => {
+              if (item.kind === "ad") {
+                const isActiveItem = idx === activeIndex;
+                const prewarm = Math.abs(idx - activeIndex) <= 1; // 前後1枚で先読み（好みで2）
+                return (
+                  <StripchatReelAd
+                    key={item.id}
+                    isActive={isActiveItem}
+                    prewarm={prewarm}
+                  />
+                );
+              }
+              const video = item.video;
               return (
                 <VideoItem
                   key={video.id}
@@ -200,7 +270,7 @@ export function MainVideoListPresenter({
                   isActive={idx === activeIndex}
                   isMuted={isMuted}
                   setIsMuted={setIsMuted}
-                  shouldRenderVideo={shouldRender}
+                  shouldRenderVideo={Math.abs(idx - activeIndex) <= 30}
                   likeVideo={likeVideo}
                   commentVideo={commentVideo}
                   isAd={false}
@@ -263,23 +333,35 @@ export function MainVideoListPresenter({
                 />
               ) : (
                 <div className="grid grid-cols-3 gap-[2px] bg-black sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                  {videos.map((video) => (
-                    <div
-                      key={video.id}
-                      onClick={() => {
-                        setSavedScrollY(window.scrollY);
-                        setIsVideoModalOpen(true);
-                        setFocusedVideoId(video.id);
-                      }}
-                      className="mb-1 cursor-pointer"
-                    >
-                      <img
-                        src={video.thumbnail_url}
-                        alt="thumbnail"
-                        className="mx-auto aspect-[9/16] w-full object-contain shadow-sm"
-                      />
-                    </div>
-                  ))}
+                  {thumbItems.map((item) => {
+                    if (item.kind === "ad") {
+                      return (
+                        <StripchatThumbVideoAdTile
+                          key={item.id}
+                          joinUrl={STRIPCHAT_AD_SRC}
+                        />
+                      );
+                    }
+
+                    const video = item.video;
+                    return (
+                      <div
+                        key={video.id}
+                        onClick={() => {
+                          setSavedScrollY(window.scrollY);
+                          setIsVideoModalOpen(true);
+                          setFocusedVideoId(video.id);
+                        }}
+                        className="mb-1 cursor-pointer"
+                      >
+                        <img
+                          src={video.thumbnail_url}
+                          alt="thumbnail"
+                          className="mx-auto aspect-[9/16] w-full object-contain shadow-sm"
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
